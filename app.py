@@ -1,19 +1,19 @@
 import sqlite3
 from flask import Flask, g, request, render_template, redirect, url_for
 
-# Create the Flask app
+#create the Flask app
 app = Flask(__name__)
 
 DATABASE = 'holzbau.db'
 
-# Helper function to get database connection
+#helper function to get the database connection
 def get_db():
     if 'db' not in g:
         g.db = sqlite3.connect(DATABASE)
         g.db.row_factory = sqlite3.Row  # Enable access by column name
     return g.db
 
-# Close the database connection when the request ends
+#close the database connection when the request ends
 @app.teardown_appcontext
 def close_db(exception):
     db = g.pop('db', None)
@@ -29,7 +29,7 @@ def home():
 
 # ---------------------- Customers ----------------------
 
-# List all customers
+#List all customers
 @app.route('/customers', methods=['GET'])
 def get_customers():
     db = get_db()
@@ -38,7 +38,7 @@ def get_customers():
     customers = cursor.fetchall()
     return render_template('customers.html', customers=customers)
 
-# Add a new customer
+#Add a new customer
 @app.route('/customers/add', methods=['POST'])
 def add_customer():
     db = get_db()
@@ -51,7 +51,7 @@ def add_customer():
     db.commit()
     return redirect(url_for('get_customers'))
 
-# Edit an existing customer
+#Edit an existing customer
 @app.route('/customers/edit/<int:customer_id>', methods=['POST'])
 def edit_customer(customer_id):
     db = get_db()
@@ -65,7 +65,7 @@ def edit_customer(customer_id):
     db.commit()
     return redirect(url_for('get_customers'))
 
-# Delete a customer
+#Delete a customer
 @app.route('/customers/delete/<int:customer_id>', methods=['POST'])
 def delete_customer(customer_id):
     db = get_db()
@@ -76,7 +76,7 @@ def delete_customer(customer_id):
 
 # ---------------------- Orders ----------------------
 
-# List all orders
+#List all orders
 @app.route('/orders', methods=['GET'])
 def get_orders():
     db = get_db()
@@ -85,7 +85,7 @@ def get_orders():
     orders = cursor.fetchall()
     return render_template('orders.html', orders=orders)
 
-# Add a new order
+#Add a new order
 @app.route('/orders/add', methods=['POST'])
 def add_order():
     db = get_db()
@@ -100,7 +100,7 @@ def add_order():
     db.commit()
     return redirect(url_for('get_orders'))
 
-# Edit an existing order
+#Edit an existing order
 @app.route('/orders/edit/<int:order_id>', methods=['POST'])
 def edit_order(order_id):
     db = get_db()
@@ -115,7 +115,7 @@ def edit_order(order_id):
     db.commit()
     return redirect(url_for('get_orders'))
 
-# Delete an order
+#Delete an order
 @app.route('/orders/delete/<int:order_id>', methods=['POST'])
 def delete_order(order_id):
     db = get_db()
@@ -124,7 +124,7 @@ def delete_order(order_id):
     db.commit()
     return redirect(url_for('get_orders'))
 
-#everythıng till here ıs part 2
+#everything till here is part 2
 
 # Start the Flask server
 if __name__ == '__main__':
