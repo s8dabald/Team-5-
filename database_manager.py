@@ -15,5 +15,5 @@ def get_from_db(query, params=None): #for database requests
             results = cursor.fetchall()
             return results
     except sqlite3.Error as e:
-        print(f"Ein Fehler ist aufgetreten: {e}")
+        print(f"There was an error: {e}")
         return(None)
