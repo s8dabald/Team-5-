@@ -25,8 +25,10 @@ def get_easter():
     return(easter.easter(year)[5:])
 
 def send_mail():
-    emails =  get_from_db("SELECT emails FROM Costumer_DB")
-    print(emails[0])
+    emails =  get_from_db("SELECT Email FROM Customer_DB")
+
+    for x in emails:
+        print(x[0])
 def holiday_check():
     heute = todays_date()
     if heute == "12-24":
