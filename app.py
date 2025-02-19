@@ -14,7 +14,7 @@ def get_db():
     if 'db' not in g:
 	# connect to the database
         g.db = sqlite3.connect(DATABASE)
-        g.db.row_factory = sqlite3.Row  # Enable access by column name
+        g.db.row_factory = sqlite3.Row  #enable access by column name
     # returns the database
     return g.db
 
@@ -25,14 +25,14 @@ def close_db(exception):
     if db is not None:
         db.close()
 
-#everything till here is part 1
+#everything untill here is part 1
 
 # this shows the home page
 @app.route('/')
 def home():
     return render_template('index.html')
 
-#shows list of all customers
+#shows the list of all customers
 @app.route('/customers', methods=['GET'])
 def get_customers():
     # gets the database
@@ -83,7 +83,7 @@ def edit_customer(customer_id):
 def delete_customer(customer_id):
     db = get_db()
     cursor = db.cursor()
-    # deletes customer from the database
+    #deletes customer from the database
     cursor.execute("DELETE FROM Customer_DB WHERE CustomerId = ?", (customer_id,))
     db.commit()
     
@@ -94,7 +94,7 @@ def delete_customer(customer_id):
 def get_orders():
     db = get_db()
     cursor = db.cursor()
-    # gets the list of all orders from the database
+    #gets the list of all orders from the database
     cursor.execute("SELECT * FROM Order_DB")
     orders = cursor.fetchall()
     #shows the list of all orders on the website
@@ -157,4 +157,3 @@ def delete_order(order_id):
 if __name__ == '__main__':
     app.run(debug=False)
     #done with task 1 and task 2
-
