@@ -71,7 +71,7 @@ def edit_customer(customer_id):
     lastname = request.form['LastName']
     age = request.form['Age']
     country = request.form['Country']
-    #updates the information for given customer
+    #updates the information for the given customer
     cursor.execute("UPDATE Customer_DB SET Name = ?, LastName = ?, Age = ?, Country = ? WHERE CustomerId = ?", 
                    (name, lastname, age, country, customer_id))
     db.commit()
@@ -84,7 +84,7 @@ def delete_customer(customer_id):
     db = get_db()
     cursor = db.cursor()
     # deletes customer from the database
-    cursor.execute("DELETE FROM Customer_DB WHERE CustomerId = ?", (customer_id))
+    cursor.execute("DELETE FROM Customer_DB WHERE CustomerId = ?", (customer_id,))
     db.commit()
     
     return redirect(url_for('get_customers'))
