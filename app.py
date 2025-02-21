@@ -1,133 +1,89 @@
 import sqlite3
 from flask import Flask, g, request, render_template, redirect, url_for
+from database_manager import execute_db_query  # Import the database function
 
-#create the Flask app
 app = Flask(__name__)
 
-DATABASE = 'holzbau.db'
+# DATABASE = 'holzbau.db'  # No longer needed here
 
-#helper function to get the database connection
+# Helper function to get the database connection (modified)
 def get_db():
     if 'db' not in g:
-        g.db = sqlite3.connect(DATABASE)
-        g.db.row_factory = sqlite3.Row  # Enable access by column name
+       g.db = True # placeholder, since we are not using direct sqlite connection here
     return g.db
 
-#close the database connection when the request ends
+# Close the database connection when the request ends (modified)
 @app.teardown_appcontext
 def close_db(exception):
-    db = g.pop('db', None)
-    if db is not None:
-        db.close()
-
-#everything till here is part 1
+    g.pop('db', None) # nothing to close
 
 # Home route
 @app.route('/')
 def home():
-    return render_template('index.html')  # Landing page
+    return render_template('index.html')
 
 # ---------------------- Customers ----------------------
 
-#List all customers
 @app.route('/customers', methods=['GET'])
 def get_customers():
-    db = get_db()
-    cursor = db.cursor()
-    cursor.execute("SELECT * FROM Customer_DB")
-    customers = cursor.fetchall()
+    customers = execute_db_query("SELECT * FROM Customer_DB")
     return render_template('customers.html', customers=customers)
 
-#Add a new customer
 @app.route('/customers/add', methods=['POST'])
 def add_customer():
-    db = get_db()
-    cursor = db.cursor()
     name = request.form['Name']
     lastname = request.form['LastName']
     age = request.form['Age']
     country = request.form['Country']
-    cursor.execute("INSERT INTO Customer_DB (Name, LastName, Age, Country) VALUES (?, ?, ?, ?)", (name, lastname, age, country))
-    db.commit()
+    execute_db_query("INSERT INTO Customer_DB (Name, LastName, Age, Country) VALUES (?, ?, ?, ?)", (name, lastname, age, country))
     return redirect(url_for('get_customers'))
 
-#Edit an existing customer
 @app.route('/customers/edit/<int:customer_id>', methods=['POST'])
 def edit_customer(customer_id):
-    db = get_db()
-    cursor = db.cursor()
     name = request.form['Name']
     lastname = request.form['LastName']
     age = request.form['Age']
     country = request.form['Country']
-    cursor.execute("UPDATE Customer_DB SET Name = ?, LastName = ?, Age = ?, Country = ? WHERE CustomerId = ?", 
-                   (name, lastname, age, country, customer_id))
-    db.commit()
+    execute_db_query("UPDATE Customer_DB SET Name = ?, LastName = ?, Age = ?, Country = ? WHERE CustomerId = ?", (name, lastname, age, country, customer_id))
     return redirect(url_for('get_customers'))
 
-#Delete a customer
 @app.route('/customers/delete/<int:customer_id>', methods=['POST'])
 def delete_customer(customer_id):
-    db = get_db()
-    cursor = db.cursor()
-    cursor.execute("DELETE FROM Customer_DB WHERE CustomerId = ?", (customer_id,))
-    db.commit()
+    execute_db_query("DELETE FROM Customer_DB WHERE CustomerId = ?", (customer_id,))
     return redirect(url_for('get_customers'))
 
 # ---------------------- Orders ----------------------
 
-#List all orders
 @app.route('/orders', methods=['GET'])
 def get_orders():
-    db = get_db()
-    cursor = db.cursor()
-    cursor.execute("SELECT * FROM Order_DB")
-    orders = cursor.fetchall()
+    orders = execute_db_query("SELECT * FROM Order_DB")
     return render_template('orders.html', orders=orders)
 
-#Add a new order
 @app.route('/orders/add', methods=['POST'])
 def add_order():
-    db = get_db()
-    cursor = db.cursor()
     customer_id = request.form['CustomerId']
     description = request.form['Description']
     price = request.form['Price']
     amount = request.form['Amount']
     date = request.form['Date']
-    cursor.execute("INSERT INTO Order_DB (CustomerId, Description, Price, Amount, Date) VALUES (?, ?, ?, ?, ?)", 
-                   (customer_id, description, price, amount, date))
-    db.commit()
+    execute_db_query("INSERT INTO Order_DB (CustomerId, Description, Price, Amount, Date) VALUES (?, ?, ?, ?, ?)", (customer_id, description, price, amount, date))
     return redirect(url_for('get_orders'))
 
-#Edit an existing order
 @app.route('/orders/edit/<int:order_id>', methods=['POST'])
 def edit_order(order_id):
-    db = get_db()
-    cursor = db.cursor()
     customer_id = request.form['CustomerId']
     description = request.form['Description']
     price = request.form['Price']
     amount = request.form['Amount']
     date = request.form['Date']
-    cursor.execute("UPDATE Order_DB SET CustomerId = ?, Description = ?, Price = ?, Amount = ?, Date = ? WHERE OrderId = ?", 
-                   (customer_id, description, price, amount, date, order_id))
-    db.commit()
+    execute_db_query("UPDATE Order_DB SET CustomerId = ?, Description = ?, Price = ?, Amount = ?, Date = ? WHERE OrderId = ?", (customer_id, description, price, amount, date, order_id))
     return redirect(url_for('get_orders'))
 
-#Delete an order
 @app.route('/orders/delete/<int:order_id>', methods=['POST'])
 def delete_order(order_id):
-    db = get_db()
-    cursor = db.cursor()
-    cursor.execute("DELETE FROM Order_DB WHERE OrderId = ?", (order_id,))
-    db.commit()
+    execute_db_query("DELETE FROM Order_DB WHERE OrderId = ?", (order_id,))
     return redirect(url_for('get_orders'))
-
-#everything till here is part 2
 
 # Start the Flask server
 if __name__ == '__main__':
     app.run(debug=True)
-
-

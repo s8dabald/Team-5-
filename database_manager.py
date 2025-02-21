@@ -1,31 +1,32 @@
 import sqlite3
 
-
-def execute_db_query(query, params=None):  #for editing/reading from the db
-    db_name = "holzbau.db"
+def execute_db_query(query, params=None):  # Function for reading/writing to the DB
+    db_name = "holzbau.db"  # Make sure this path is correct
     try:
         with sqlite3.connect(db_name) as connection:
+
+            connection.row_factory = sqlite3.Row
             cursor = connection.cursor()
             if params:
-                cursor.execute(query, params)
+                cursor.execute(query, params)  # Execute query with parameters if provided
             else:
-                cursor.execute(query)
+                cursor.execute(query)  # Execute query without parameters
 
-            #checks which sql function is used
+            # Check for modifying queries (INSERT, UPDATE, DELETE, etc.)
             if query.strip().upper().startswith(("INSERT", "UPDATE", "DELETE", "CREATE", "DROP")):
-                connection.commit()
-                return cursor.rowcount
+                connection.commit()  # Commit changes for modifying queries
+                return cursor.rowcount  # Return number of affected rows
             else:
-
-                return cursor.fetchall()
+                return cursor.fetchall()  # Return fetched results for SELECT queries
     except sqlite3.Error as e:
-        print(f"There was an error: {e}")
-        return None
+        print(f"There was an error: {e}")  # Print the error
+        return None  # Return None in case of error
 
-def delete_last_logged_mail(): #for testing purposes will be removed in final version I guess
+# Testing function (can be removed later)
+def delete_last_logged_mail():
     query = "DELETE FROM Email_Log WHERE rowid = (SELECT MAX(rowid) FROM Email_Log);"
     rows_affected = execute_db_query(query)
     if rows_affected:
-        print(f"{rows_affected} Zeile(n) erfolgreich gelöscht.")
+        print(f"{rows_affected} row(s) successfully deleted.")
     else:
-        print("Fehler beim Löschen der letzten Zeile.")
+        print("Error deleting the last row.")
