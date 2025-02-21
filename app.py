@@ -18,6 +18,15 @@ def get_db():
     # returns the database
     return g.db
 
+# This function helps to fetch the data, it is used in the dashboard route. 
+def fetch_data():
+    conn = get_db()
+    customers = pd.read_sql_query("SELECT * FROM Customer_DB", conn)
+    orders = pd.read_sql_query("SELECT * FROM Order_DB", conn)
+    conn.close()
+    return customers, orders
+
+
 #when website closes, dısconnects the database from the website
 @app.teardown_appcontext
 def close_db(exception):
@@ -152,6 +161,26 @@ def delete_order(order_id):
     return redirect(url_for('get_orders'))
 
 #everything till here is part 2
+######### Dashboard Routes ####################
+@app.route("/dashboard")
+def dashboard():
+    customers, orders = fetch_data()
+    country_distribution = customers['Country'].value_counts().to_dict()
+    popular_products = orders['Description'].value_counts().to_dict()
+    merged = customers.merge(orders, left_on='CustomerId', right_on='CustomerId')
+    grouped = merged.groupby('CustomerId')[['Price', 'Amount']].sum()
+    kmeans = KMeans(n_clusters=3)
+    grouped['Segment'] = kmeans.fit_predict(grouped)
+    segments = grouped['Segment'].value_counts().to_dict()
+    segment_labels = {0: "Low Spenders", 1: "Medium Spenders", 2: "High Spenders"}
+    segments = {segment_labels[key]: value for key, value in segments.items()}
+    orders['Date'] = pd.to_datetime(orders['Date'])
+    sales_trend = orders.groupby(orders['Date'].dt.to_period("M"))['Amount'].sum().to_dict()
+    sales_trend = {str(k): v for k, v in sales_trend.items()}
+    return render_template("dashboard.html", country_distribution=country_distribution, 
+                           popular_products=popular_products, segments=segments, 
+                           sales_trend=sales_trend)
+
 
 #starts the webpage
 if __name__ == '__main__':
