@@ -1,18 +1,15 @@
-import sqlite3
 import pandas as pd
 from mlxtend.frequent_patterns import apriori, association_rules
+from database_manager import execute_db_query
 
-# Connecting to SQLite database
-db_path = 'holzbau.db'
-conn = sqlite3.connect(db_path)
 
-# Querying necessary data from the database
 query = """
 SELECT OrderId, CustomerId, Description 
 FROM Order_DB
 """
+
 # Load the data into a DataFrame
-df = pd.read_sql(query, conn)
+df = execute_db_query(query)
 
 # Group by CustomerID and aggregate the items each customer bought
 # We will mark 1 if the customer bought the specific item, 0 if not.
