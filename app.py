@@ -4,19 +4,6 @@ from database_manager import execute_db_query  # Import the database function
 
 app = Flask(__name__)
 
-# DATABASE = 'holzbau.db'  # No longer needed here
-
-# Helper function to get the database connection (modified)
-def get_db():
-    if 'db' not in g:
-       g.db = True # placeholder, since we are not using direct sqlite connection here
-    return g.db
-
-# Close the database connection when the request ends (modified)
-@app.teardown_appcontext
-def close_db(exception):
-    g.pop('db', None) # nothing to close
-
 # Home route
 @app.route('/')
 def home():
