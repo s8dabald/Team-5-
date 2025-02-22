@@ -29,17 +29,20 @@
 </div>
 
 <script>
-    // Data from Flask (replace with your actual data from the Flask route)
+    // Pass the country distribution from Flask to JavaScript
     var countryData = {{ country_distribution | tojson }};
     var productData = {{ popular_products | tojson }};
-    var segmentData = {{ segments | tojson }};
-    var salesTrendData = {{ sales_trend | tojson }};
 
-    // Country Chart
+    // Extract labels (countries) and values (counts)
     var countryLabels = Object.keys(countryData);
     var countryValues = Object.values(countryData);
-    var countryCtx = document.getElementById('countryChart').getContext('2d');
-    new Chart(countryCtx, {
+    var productLabels = Object.keys(productData);
+    var productData = Object.values(productData)
+
+    // Create Chart.js bar chart
+    var ctx = document.getElementById('countryChart').getContext('2d');
+    var ptx = document.getElementById('productChart').getContext('2d');
+    new Chart(ctx, {
         type: 'bar',
         data: {
             labels: countryLabels,
@@ -60,20 +63,15 @@
             }
         }
     });
-
-    // Product Chart
-    var productLabels = Object.keys(productData);
-    var productValues = Object.values(productData);
-    var productCtx = document.getElementById('productChart').getContext('2d');
-    new Chart(productCtx, {
+    new Chart(ptx, {
         type: 'bar',
         data: {
             labels: productLabels,
             datasets: [{
                 label: 'Popular Products',
-                data: productValues,
-                backgroundColor: 'rgba(255, 99, 132, 0.5)', // Different color
-                borderColor: 'rgba(255, 99, 132, 1)',
+                data: productData,
+                backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                borderColor: 'rgba(54, 162, 235, 1)',
                 borderWidth: 1
             }]
         },
@@ -86,16 +84,21 @@
             }
         }
     });
+    var segmentData = {{ segments | tojson }};
 
-    // Customer Segments (Pie Chart)
-    var segmentLabels = Object.keys(segmentData).map(label => 'Segment ' + label); // Add "Segment" prefix
+    // Extract segment labels and counts
+    var segmentLabels = Object.keys(segmentData);
     var segmentCounts = Object.values(segmentData);
-    var segmentColors = ['rgba(255, 99, 132, 0.7)', 'rgba(54, 162, 235, 0.7)', 'rgba(75, 192, 192, 0.7)']; // Colors
-    var segmentCtx = document.getElementById('customerSegments').getContext('2d');
-    new Chart(segmentCtx, {
+
+    // Define colors for the segments
+    var segmentColors = ['rgba(255, 99, 132, 0.7)', 'rgba(54, 162, 235, 0.7)', 'rgba(75, 192, 192, 0.7)'];
+
+    // Create Chart.js pie chart
+    var stx = document.getElementById('customerSegments').getContext('2d');
+    new Chart(stx, {
         type: 'pie',
         data: {
-            labels: segmentLabels,
+            labels: segmentLabels.map(label => 'Segment ' + label),
             datasets: [{
                 data: segmentCounts,
                 backgroundColor: segmentColors,
@@ -113,14 +116,19 @@
         }
     });
 
-    // Sales Trend Chart
-    var salesLabels = Object.keys(salesTrendData);
-    var salesValues = Object.values(salesTrendData);
-    var salesCtx = document.getElementById('salesTrendChart').getContext('2d');
-    new Chart(salesCtx, {
+
+    var salesTrendData = {{ sales_trend | tojson }};
+
+    // Extract dates and sales values
+    var labels = Object.keys(salesTrendData);  // Months
+    var salesValues = Object.values(salesTrendData);  // Sales count
+
+    // Create the line chart using Chart.js
+    var ctx = document.getElementById('salesTrendChart').getContext('2d');
+    new Chart(ctx, {
         type: 'line',
         data: {
-            labels: salesLabels,
+            labels: labels,
             datasets: [{
                 label: 'Sales per Month',
                 data: salesValues,
