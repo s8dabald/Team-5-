@@ -1,3 +1,5 @@
-from database_manager import execute_db_query
+from app import app
 
+if __name__ == '__main__':
+    app.run(debug=True)
 
