@@ -30,3 +30,5 @@ def delete_last_logged_mail():
         print(f"{rows_affected} row(s) successfully deleted.")
     else:
         print("Error deleting the last row.")
+
+

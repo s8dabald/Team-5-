@@ -1,0 +1,129 @@
+<div class="navbar">
+    <button class="back-btn" onclick="history.back()">&#8592; Back</button>
+    <h1>Holiday Offers</h1>
+</div>
+
+<div class="offer-settings">
+    <div class="offer-row">
+        <h2>Christmas</h2>
+        <div class="offer-controls">
+            <label class="checkbox-col" for="christmas-active">
+                <input type="checkbox" id="christmas-active" name="christmas-active" {% if offers.get('christmas', {}).get('active') %}checked{% endif %}> Activate Offer
+            </label>
+            <div class="percentage-group">
+                <label class="percentage-col" for="christmas-percentage">Percentage:</label>
+                <input class="percentage-input" type="number" id="christmas-percentage" name="christmas-percentage" min="0" max="100" value="{{ offers.get('christmas', {}).get('percentage', 0) }}"> %
+            </div>
+        </div>
+    </div>
+    <div class="offer-row">
+        <h2>Black Friday</h2>
+        <div class="offer-controls">
+            <label class="checkbox-col" for="blackfriday-active">
+                <input type="checkbox" id="blackfriday-active" name="blackfriday-active" {% if offers.get('blackfriday', {}).get('active') %}checked{% endif %}> Activate Offer
+            </label>
+            <div class="percentage-group">
+                <label class="percentage-col" for="blackfriday-percentage">Percentage:</label>
+                <input class="percentage-input" type="number" id="blackfriday-percentage" name="blackfriday-percentage" min="0" max="100" value="{{ offers.get('blackfriday', {}).get('percentage', 0) }}"> %
+            </div>
+        </div>
+    </div>
+    <div class="offer-row">
+        <h2>Easter</h2>
+        <div class="offer-controls">
+            <label class="checkbox-col" for="easter-active">
+                <input type="checkbox" id="easter-active" name="easter-active" {% if offers.get('easter', {}).get('active') %}checked{% endif %}> Activate Offer
+            </label>
+            <div class="percentage-group">
+                <label class="percentage-col" for="easter-percentage">Percentage:</label>
+                <input class="percentage-input" type="number" id="easter-percentage" name="easter-percentage" min="0" max="100" value="{{ offers.get('easter', {}).get('percentage', 0) }}"> %
+            </div>
+        </div>
+    </div>
+</div>
+
+<button onclick="saveOffers()">Save Changes</button>
+
+<script>
+    function saveOffers() {
+        const offers = {
+            christmas: {
+                active: document.getElementById('christmas-active').checked,
+                percentage: document.getElementById('christmas-percentage').value
+            },
+            blackfriday: {
+                active: document.getElementById('blackfriday-active').checked,
+                percentage: document.getElementById('blackfriday-percentage').value
+            },
+            easter: {
+                active: document.getElementById('easter-active').checked,
+                percentage: document.getElementById('easter-percentage').value
+            }
+        };
+
+        // Validate before sending
+        if (
+            (offers.christmas.active && (offers.christmas.percentage < 0 || offers.christmas.percentage > 100)) ||
+            (offers.blackfriday.active && (offers.blackfriday.percentage < 0 || offers.blackfriday.percentage > 100)) ||
+            (offers.easter.active && (offers.easter.percentage < 0 || offers.easter.percentage > 100))
+        ) {
+            alert("Percentage values must be between 0 and 100.");
+            return; // Stop execution if validation fails
+        }
+
+        fetch('/save_offers', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(offers)
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Offers saved:', data);
+            alert("Offers saved successfully!");
+        })
+        .catch(error => {
+            console.error('Error saving offers:', error);
+            alert("Error saving offers. Please try again.");
+        });
+    }
+</script>
+
+<style>
+    .offer-row {
+        display: flex;
+        align-items: baseline; /* Align to baseline */
+        margin-bottom: 10px;
+    }
+
+    .offer-row h2 {
+        margin-right: 20px;
+        width: 100px;
+    }
+
+    .offer-controls {
+        display: flex;
+        align-items: baseline; /* Align to baseline */
+        width: 300px;
+    }
+
+    .checkbox-col {
+        width: 120px;
+    }
+
+    .percentage-group {
+        display: flex;
+        align-items: baseline; /* Align to baseline */
+        width: 180px;
+    }
+
+    .percentage-col {
+        width: 90px;
+        margin-right: 10px;
+    }
+
+    .percentage-input {
+        width: 60px;
+    }
+</style>

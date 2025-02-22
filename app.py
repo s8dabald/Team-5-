@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, redirect, url_for
+from flask import Flask, request, render_template, redirect, url_for, jsonify
 from database_manager import execute_db_query  # Import the execute_db_query function
 
 # Create the Flask app
@@ -126,7 +126,37 @@ def delete_order(order_id):
     execute_db_query(query, params)  # Delete the order from the database
     return redirect(url_for('get_orders'))  # Redirect to the orders list page
 
+#For the offers screen
+@app.route('/offers', methods=['GET'])
+def offers():
+    try:
+        offers_data = {}
+        rows = execute_db_query("SELECT holiday, active, percentage FROM Offers")  # Note: "Offers" (capital O)
+        if rows:
+            for row in rows:
+                offers_data[row['holiday']] = {'active': bool(row['active']), 'percentage': row['percentage']}
 
+    except Exception as e:
+        print(f"Error fetching offers: {e}")
+        offers_data = {}  # Provide a default value in case of error
+
+    return render_template('offers.html', offers=offers_data)
+
+@app.route('/save_offers', methods=['POST'])
+def save_offers():
+    try:
+        offers_data = request.get_json()
+        for holiday, settings in offers_data.items():
+            rows_affected = execute_db_query(
+                "INSERT OR REPLACE INTO Offers (holiday, active, percentage) VALUES (?, ?, ?)",
+                (holiday, settings['active'], settings['percentage'])
+            )
+            if rows_affected is None:  # Check for database errors
+                return jsonify({'error': 'Error saving offers'}), 500  # Return error
+        return jsonify({'message': 'Offers saved successfully'}), 200
+    except Exception as e:
+        print(f"Error saving offers: {e}")
+        return jsonify({'error': 'Error saving offers'}), 500
 # Start the Flask server
 if __name__ == '__main__':
     app.run(debug=True)
