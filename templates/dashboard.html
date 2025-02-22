@@ -29,5 +29,118 @@
 </div>
 
 <script>
-    // ... (Your JavaScript code for the charts remains the same) ...
+    // Data from Flask (replace with your actual data from the Flask route)
+    var countryData = {{ country_distribution | tojson }};
+    var productData = {{ popular_products | tojson }};
+    var segmentData = {{ segments | tojson }};
+    var salesTrendData = {{ sales_trend | tojson }};
+
+    // Country Chart
+    var countryLabels = Object.keys(countryData);
+    var countryValues = Object.values(countryData);
+    var countryCtx = document.getElementById('countryChart').getContext('2d');
+    new Chart(countryCtx, {
+        type: 'bar',
+        data: {
+            labels: countryLabels,
+            datasets: [{
+                label: 'Number of Customers',
+                data: countryValues,
+                backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // Product Chart
+    var productLabels = Object.keys(productData);
+    var productValues = Object.values(productData);
+    var productCtx = document.getElementById('productChart').getContext('2d');
+    new Chart(productCtx, {
+        type: 'bar',
+        data: {
+            labels: productLabels,
+            datasets: [{
+                label: 'Popular Products',
+                data: productValues,
+                backgroundColor: 'rgba(255, 99, 132, 0.5)', // Different color
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // Customer Segments (Pie Chart)
+    var segmentLabels = Object.keys(segmentData).map(label => 'Segment ' + label); // Add "Segment" prefix
+    var segmentCounts = Object.values(segmentData);
+    var segmentColors = ['rgba(255, 99, 132, 0.7)', 'rgba(54, 162, 235, 0.7)', 'rgba(75, 192, 192, 0.7)']; // Colors
+    var segmentCtx = document.getElementById('customerSegments').getContext('2d');
+    new Chart(segmentCtx, {
+        type: 'pie',
+        data: {
+            labels: segmentLabels,
+            datasets: [{
+                data: segmentCounts,
+                backgroundColor: segmentColors,
+                borderColor: 'rgba(255, 255, 255, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top'
+                }
+            }
+        }
+    });
+
+    // Sales Trend Chart
+    var salesLabels = Object.keys(salesTrendData);
+    var salesValues = Object.values(salesTrendData);
+    var salesCtx = document.getElementById('salesTrendChart').getContext('2d');
+    new Chart(salesCtx, {
+        type: 'line',
+        data: {
+            labels: salesLabels,
+            datasets: [{
+                label: 'Sales per Month',
+                data: salesValues,
+                borderColor: 'rgba(75, 192, 192, 1)',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderWidth: 2,
+                pointRadius: 3,
+                pointBackgroundColor: 'rgba(75, 192, 192, 1)',
+                tension: 0.3
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'top' }
+            },
+            scales: {
+                x: { title: { display: true, text: 'Month' } },
+                y: { title: { display: true, text: 'Sales Count' } }
+            }
+        }
+    });
 </script>
