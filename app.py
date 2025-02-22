@@ -1,4 +1,6 @@
 from flask import Flask, request, render_template, redirect, url_for, jsonify
+from sklearn.cluster import KMeans
+import pandas as pd
 from database_manager import execute_db_query  # Import the execute_db_query function
 
 # Create the Flask app
@@ -126,8 +128,48 @@ def delete_order(order_id):
     execute_db_query(query, params)  # Delete the order from the database
     return redirect(url_for('get_orders'))  # Redirect to the orders list page
 
-#For the offers screen
-@app.route('/offers', methods=['GET'])
+# ---------------------- Dashboard ----------------------
+@app.route("/dashboard")
+def dashboard():
+    customer_data = execute_db_query("SELECT * FROM Customer_DB")
+    customers = pd.DataFrame([dict(row) for row in customer_data]) if customer_data else pd.DataFrame()
+
+    order_data = execute_db_query("SELECT * FROM Order_DB")
+    orders = pd.DataFrame([dict(row) for row in order_data]) if order_data else pd.DataFrame()
+
+    country_distribution = {}
+    popular_products = {}
+    segments = {}
+    sales_trend = {}
+
+    if not customers.empty and not orders.empty:
+        country_distribution = customers['Country'].value_counts().to_dict()
+
+        popular_products = orders['Description'].value_counts().to_dict()
+
+        merged = customers.merge(orders, left_on='CustomerId', right_on='CustomerId')
+
+        grouped = merged.groupby('CustomerId')[['Price', 'Amount']].sum()
+
+        kmeans = KMeans(n_clusters=3, random_state=42)  # Add random_state for consistent clustering
+        grouped['Segment'] = kmeans.fit_predict(grouped)
+
+        segment_labels = {0: "Low Spenders", 1: "Medium Spenders", 2: "High Spenders"}
+        segments = {segment_labels[key]: value for key, value in grouped['Segment'].value_counts().to_dict().items()}
+
+        orders['Date'] = pd.to_datetime(orders['Date'], errors='coerce')  # Convert to datetime, handle errors
+        sales_trend = orders.groupby(orders['Date'].dt.to_period("M"))['Amount'].sum().to_dict()
+        sales_trend = {str(k): v for k, v in sales_trend.items()}
+
+
+    return render_template("dashboard.html", country_distribution=country_distribution,
+                           popular_products=popular_products, segments=segments,
+                           sales_trend=sales_trend)
+
+
+
+# ---------------------- Offers ----------------------
+@app.route('/offers', methods=['GET']) #to display current offer settings & the email_log
 def offers():
     try:
         offers_data = {}

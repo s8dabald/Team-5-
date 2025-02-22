@@ -1,35 +1,43 @@
-<h1>Customers</h1>
-<form action="/customers/add" method="POST">
-    <input type="text" name="Name" placeholder="Name" required>
-    <input type="text" name="LastName" placeholder="Last Name" required>
-    <input type="number" name="Age" placeholder="Age" required>
-    <input type="text" name="Country" placeholder="Country" required>
-    <button type="submit">Add Customer</button>
-</form>
-<table border="1">
-    <tr>
-        <th>ID</th><th>Name</th><th>Last Name</th><th>Age</th><th>Country</th><th>Actions</th>
-    </tr>
-    {% for customer in customers %}
-    <tr>
-        <td>{{ customer.CustomerId }}</td>
-        <td>{{ customer.Name }}</td>
-        <td>{{ customer.LastName }}</td>
-        <td>{{ customer.Age }}</td>
-        <td>{{ customer.Country }}</td>
-        <td>
-            <form action="/customers/edit/{{ customer.CustomerId }}" method="POST" style="display:inline;">
-                <input type="text" name="Name" value="{{ customer.Name }}" required>
-                <input type="text" name="LastName" value="{{ customer.LastName }}" required>
-                <input type="number" name="Age" value="{{ customer.Age }}" required>
-                <input type="text" name="Country" value="{{ customer.Country }}" required>
-                <button type="submit">Edit</button>
-            </form>
-            <form action="/customers/delete/{{ customer.CustomerId }}" method="POST" style="display:inline;">
-                <button type="submit">Delete</button>
-            </form>
-        </td>
-    </tr>
-    {% endfor %}
-</table>
-<a href="/">Back to Home</a>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Customers</title>
+</head>
+<body>
+    <h1>Customers</h1>
+    <form action="/customers/add" method="POST">
+        <input type="text" name="Name" placeholder="Name" required>
+        <input type="text" name="LastName" placeholder="Last Name" required>
+        <input type="number" name="Age" placeholder="Age" required>
+        <input type="text" name="Country" placeholder="Country" required>
+        <button type="submit">Add Customer</button>
+    </form>
+    <table border="1">
+        <tr>
+            <th>ID</th><th>Name</th><th>Last Name</th><th>Age</th><th>Country</th><th>Actions</th>
+        </tr>
+        {% for customer in customers %}
+        <tr>
+            <td>{{ customer.CustomerId }}</td>
+            <td>{{ customer.Name }}</td>
+            <td>{{ customer.LastName }}</td>
+            <td>{{ customer.Age }}</td>
+            <td>{{ customer.Country }}</td>
+            <td>
+                <form action="/customers/edit/{{ customer.CustomerId }}" method="POST" style="display:inline;">
+                    <input type="text" name="Name" value="{{ customer.Name }}" required>
+                    <input type="text" name="LastName" value="{{ customer.LastName }}" required>
+                    <input type="number" name="Age" value="{{ customer.Age }}" required>
+                    <input type="text" name="Country" value="{{ customer.Country }}" required>
+                    <button type="submit">Edit</button>
+                </form>
+                <form action="/customers/delete/{{ customer.CustomerId }}" method="POST" style="display:inline;">
+                    <button type="submit">Delete</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    <a href="/">Back to Home</a>
+</body>
+</html>
