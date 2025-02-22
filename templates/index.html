@@ -2,11 +2,52 @@
 <html>
 <head>
     <title>Holzbau Database</title>
+    <style>
+        body {
+            display: flex; /* Use flexbox for layout */
+            height: 100vh; /* Make body full viewport height */
+            margin: 0; /* Remove default margins */
+        }
+
+        nav {
+            width: 200px; /* Set width for the navigation bar */
+            background-color: #f0f0f0; /* Example background color */
+            padding: 20px;
+        }
+
+        nav a {
+            display: block; /* Make links stack vertically */
+            margin-bottom: 10px;
+            padding: 10px;
+            text-decoration: none;
+            color: #333; /* Example text color */
+        }
+
+        #content {
+            flex: 1; /* Make content area take up remaining space */
+            padding: 20px;
+            border-left: 1px solid #ccc; /* Add a separator line */
+            overflow-y: auto; /* Add scroll if content overflows */
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    </style>
 </head>
 <body>
-    <h1>Welcome to the Holzbau Database!</h1>
-    <a href="/customers">Manage Customers</a><br>
-    <a href="/orders">Manage Orders</a>
-    <a href="/dashboard"> Go to Dashboard</a>
+
+    <nav>
+        <h1>Holzbau</h1>
+        <a href="/dashboard" target="contentFrame">Dashboard</a>
+        <a href="/customers" target="contentFrame">Customers</a>
+        <a href="/orders" target="contentFrame">Orders</a>
+    </nav>
+
+    <div id="content">
+        <iframe name="contentFrame"></iframe>  </div>
+
 </body>
 </html>

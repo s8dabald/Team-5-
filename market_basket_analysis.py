@@ -1,7 +1,9 @@
 import pandas as pd
 from mlxtend.frequent_patterns import apriori, association_rules
 from database_manager import execute_db_query
-
+pd.set_option('display.max_rows', None)
+pd.set_option('display.max_columns', None)
+pd.set_option('display.width', None)
 query = """
 SELECT OrderId, CustomerId, Description 
 FROM Order_DB
