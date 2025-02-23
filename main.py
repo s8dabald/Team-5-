@@ -2,6 +2,7 @@ import asyncio
 from app import app
 import offers
 
+
 async def run_flask_app():
     app.run(debug=True)
 

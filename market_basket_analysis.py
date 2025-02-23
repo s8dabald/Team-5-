@@ -8,16 +8,8 @@ query = """
 SELECT OrderId, CustomerId, Description 
 FROM Order_DB
 """
-
-# Use execute_db_query to fetch the data
-data = execute_db_query(query)
-
-# Convert the list of tuples to a list of lists (required for DataFrame creation)
-data_list = [list(row) for row in data]
-
-# Load the data into a DataFrame
-df = pd.DataFrame(data_list, columns=['OrderId', 'CustomerId', 'Description'])
-
+#fetch the data and put it in the dataframe
+df = pd.DataFrame(execute_db_query(query), columns=['OrderId', 'CustomerId', 'Description'])
 
 # Group by CustomerID and aggregate the items each customer bought
 basket = df.groupby(['CustomerId', 'Description']).size().unstack(fill_value=0)

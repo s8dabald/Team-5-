@@ -1,11 +1,12 @@
 import sqlite3
 
-def execute_db_query(query, params=None):  # Function for reading/writing to the DB
+def execute_db_query(query, params=None, as_dict=False):  # Function for reading/writing to the DB
     db_name = "holzbau.db"  # Make sure this path is correct
     try:
         with sqlite3.connect(db_name) as connection:
 
-            connection.row_factory = sqlite3.Row
+            if as_dict:
+                connection.row_factory = sqlite3.Row
             cursor = connection.cursor()
             if params:
                 cursor.execute(query, params)  # Execute query with parameters if provided
@@ -31,4 +32,4 @@ def delete_last_logged_mail():
     else:
         print("Error deleting the last row.")
 
-
+#delete_last_logged_mail()

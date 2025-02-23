@@ -2,6 +2,7 @@ from flask import Flask, request, render_template, redirect, url_for, jsonify
 from sklearn.cluster import KMeans
 import pandas as pd
 from database_manager import execute_db_query  # Import the execute_db_query function
+#from offers import settings_changed_event
 
 # Create the Flask app
 app = Flask(__name__)
@@ -19,7 +20,7 @@ def home():
 @app.route('/customers', methods=['GET'])
 def get_customers():
     query = "SELECT * FROM Customer_DB"  # Query to select all customers
-    customers = execute_db_query(query)  # Call the execute_db_query function to fetch customers
+    customers = execute_db_query(query, as_dict= True)  # Call the execute_db_query function to fetch customers
     return render_template('customers.html', customers=customers)
 
 
@@ -76,7 +77,7 @@ def delete_customer(customer_id):
 @app.route('/orders', methods=['GET'])
 def get_orders():
     query = "SELECT * FROM Order_DB"  # Query to select all orders
-    orders = execute_db_query(query)  # Call the execute_db_query function to fetch orders
+    orders = execute_db_query(query, as_dict=True)  # Call the execute_db_query function to fetch orders
     return render_template('orders.html', orders=orders)
 
 
@@ -131,10 +132,10 @@ def delete_order(order_id):
 # ---------------------- Dashboard ----------------------
 @app.route("/dashboard")
 def dashboard():
-    customer_data = execute_db_query("SELECT * FROM Customer_DB")
+    customer_data = execute_db_query("SELECT * FROM Customer_DB",  as_dict=True)
     customers = pd.DataFrame([dict(row) for row in customer_data]) if customer_data else pd.DataFrame()
 
-    order_data = execute_db_query("SELECT * FROM Order_DB")
+    order_data = execute_db_query("SELECT * FROM Order_DB", as_dict=True)
     orders = pd.DataFrame([dict(row) for row in order_data]) if order_data else pd.DataFrame()
 
     country_distribution = {}
@@ -195,6 +196,7 @@ def save_offers():
             )
             if rows_affected is None:  # Check for database errors
                 return jsonify({'error': 'Error saving offers'}), 500  # Return error
+        #settings_changed_event.set()
         return jsonify({'message': 'Offers saved successfully'}), 200
     except Exception as e:
         print(f"Error saving offers: {e}")
