@@ -177,6 +177,9 @@ def save_offers():
     except Exception as e:
         print(f"Error saving offers: {e}")
         return jsonify({'error': 'Error saving offers'}), 500
+        
+# ---------------------- Recommendation Engine ----------------------
+
 # Start the Flask server
 if __name__ == '__main__':
     app.run(debug=True)
