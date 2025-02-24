@@ -1,12 +1,12 @@
 import sqlite3
 
 def execute_db_query(query, params=None, as_dict=False):  # Function for reading/writing to the DB
-    db_name = "holzbau.db"  # Make sure this path is correct
+    db_name = "holzbau.db"  #db path
     try:
         with sqlite3.connect(db_name) as connection:
 
             if as_dict:
-                connection.row_factory = sqlite3.Row
+                connection.row_factory = sqlite3.Row #returns row objects which is useful for certain applications
             cursor = connection.cursor()
             if params:
                 cursor.execute(query, params)  # Execute query with parameters if provided

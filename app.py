@@ -1,8 +1,6 @@
 from flask import Flask, request, render_template, redirect, url_for, jsonify
-from sklearn.cluster import KMeans
-import pandas as pd
-from database_manager import execute_db_query  # Import the execute_db_query function
-#from offers import settings_changed_event
+from data_analysis import get_dashboard_data
+from database_manager import execute_db_query
 
 # Create the Flask app
 app = Flask(__name__)
@@ -18,7 +16,7 @@ def home():
 
 # List all customers
 @app.route('/customers', methods=['GET'])
-def get_customers():
+def get_customers(): #displays customers
     query = "SELECT * FROM Customer_DB"  # Query to select all customers
     customers = execute_db_query(query, as_dict= True)  # Call the execute_db_query function to fetch customers
     return render_template('customers.html', customers=customers)
@@ -132,35 +130,7 @@ def delete_order(order_id):
 # ---------------------- Dashboard ----------------------
 @app.route("/dashboard")
 def dashboard():
-    customer_data = execute_db_query("SELECT * FROM Customer_DB",  as_dict=True)
-    customers = pd.DataFrame([dict(row) for row in customer_data]) if customer_data else pd.DataFrame()
-
-    order_data = execute_db_query("SELECT * FROM Order_DB", as_dict=True)
-    orders = pd.DataFrame([dict(row) for row in order_data]) if order_data else pd.DataFrame()
-
-    country_distribution = {}
-    popular_products = {}
-    segments = {}
-    sales_trend = {}
-
-    if not customers.empty and not orders.empty:
-        country_distribution = customers['Country'].value_counts().to_dict()
-
-        popular_products = orders['Description'].value_counts().to_dict()
-
-        merged = customers.merge(orders, left_on='CustomerId', right_on='CustomerId')
-
-        grouped = merged.groupby('CustomerId')[['Price', 'Amount']].sum()
-
-        kmeans = KMeans(n_clusters=3, random_state=42)  # Add random_state for consistent clustering
-        grouped['Segment'] = kmeans.fit_predict(grouped)
-
-        segment_labels = {0: "Low Spenders", 1: "Medium Spenders", 2: "High Spenders"}
-        segments = {segment_labels[key]: value for key, value in grouped['Segment'].value_counts().to_dict().items()}
-
-        orders['Date'] = pd.to_datetime(orders['Date'], errors='coerce')  # Convert to datetime, handle errors
-        sales_trend = orders.groupby(orders['Date'].dt.to_period("M"))['Amount'].sum().to_dict()
-        sales_trend = {str(k): v for k, v in sales_trend.items()}
+    country_distribution, popular_products, segments, sales_trend = get_dashboard_data()
 
 
     return render_template("dashboard.html", country_distribution=country_distribution,
@@ -174,7 +144,7 @@ def dashboard():
 def offers():
     try:
         offers_data = {}
-        rows = execute_db_query("SELECT holiday, active, percentage FROM Offers")  # Note: "Offers" (capital O)
+        rows = execute_db_query("SELECT holiday, active, percentage FROM Offers", as_dict=True)  # Note: "Offers" (capital O)
         if rows:
             for row in rows:
                 offers_data[row['holiday']] = {'active': bool(row['active']), 'percentage': row['percentage']}
