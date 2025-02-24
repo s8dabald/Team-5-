@@ -1,14 +1,17 @@
 import pandas as pd
 from sklearn.cluster import KMeans
 from database_manager import execute_db_query
-def get_data():
+def get_data():#to get data from DB
     customer_data = execute_db_query("SELECT * FROM Customer_DB", as_dict=True)
+    #after the db execute puts  it in a dataframe if the data is empty creates  an empty dataframe
     customers = pd.DataFrame([dict(row) for row in customer_data]) if customer_data else pd.DataFrame()
 
     order_data = execute_db_query("SELECT * FROM Order_DB", as_dict=True)
+    # after the db execute puts  it in a dataframe if the data is empty creates  an empty dataframe
     orders = pd.DataFrame([dict(row) for row in order_data]) if order_data else pd.DataFrame()
     return customers, orders
-def get_segments(orders, customers):
+
+def get_segments(orders, customers):#gets the different segments
     merged = customers.merge(orders, left_on='CustomerId', right_on='CustomerId')
 
     grouped = merged.groupby('CustomerId')[['Price', 'Amount']].sum()
@@ -28,7 +31,7 @@ def get_sales_trend(orders):
 
 def get_dashboard_data():
     customers, orders= get_data()
-
+    #to prevent a crash if the data collection failed  we return empty
     if customers.empty or orders.empty:
         return {}, {}, {}, {}
     popular_products = orders['Description'].value_counts().to_dict()
@@ -36,13 +39,12 @@ def get_dashboard_data():
     return country_distribution,popular_products, get_segments(orders, customers), get_sales_trend(orders)
 
 def get_loyal_customers():
-    """Ermittelt die Top 10 Kunden nach Bestellhäufigkeit und Ausgaben"""
-    customers, orders = get_data()
+    customers, orders = get_data() #get data
 
-    if customers.empty or orders.empty:
+    if customers.empty or orders.empty: # prevents crash in case of error
         return [], []
 
-    # Kunden mit den meisten Bestellungen
+    # adds up all of the orders with the same ID and then orders them by most orders and takes the top10
     top_customers_by_orders = (
         orders.groupby("CustomerId")
         .size()
@@ -51,10 +53,10 @@ def get_loyal_customers():
         .head(10)
     )
 
-    # Berechnung des gesamten ausgegebenen Betrags (Price * Amount)
+    #calculates total spent per customer
     orders["TotalSpent"] = orders["Price"] * orders["Amount"]
 
-    # Top 10 größte Spender
+    # adds up all of total spends with the same ID and then orders them by most orders and takes the top10
     top_biggest_spenders = (
         orders.groupby("CustomerId")["TotalSpent"]
         .sum()
@@ -63,7 +65,7 @@ def get_loyal_customers():
         .head(10)
     )
 
-    # Merge mit Kundendaten für vollständige Informationen
+    #merges data to return the full dataset
     top_customers_by_orders = top_customers_by_orders.merge(customers, on="CustomerId", how="left").to_dict(orient="records")
     top_biggest_spenders = top_biggest_spenders.merge(customers, on="CustomerId", how="left").to_dict(orient="records")
 
