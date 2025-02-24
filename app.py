@@ -1,5 +1,5 @@
 from flask import Flask, request, render_template, redirect, url_for, jsonify
-from data_analysis import get_dashboard_data
+from data_analysis import get_dashboard_data, get_loyal_customers
 from database_manager import execute_db_query
 
 # Create the Flask app
@@ -68,6 +68,12 @@ def delete_customer(customer_id):
     execute_db_query(query, params)  # Delete the customer from the database
     return redirect(url_for('get_customers'))  # Redirect to the customers list page
 
+
+# ---------------------- Loyal Customers ----------------------
+@app.route("/loyal_customers")
+def top_customers():
+    top_orders, top_spenders = get_loyal_customers()
+    return render_template("loyal_customers.html", top_orders=top_orders, top_spenders=top_spenders)
 
 # ---------------------- Orders ----------------------
 

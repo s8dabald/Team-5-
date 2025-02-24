@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Top Customers</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        h2 {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Top 10 Customers</h1>
+
+    <h2>Top 10 by Most Orders</h2>
+    <table>
+        <tr>
+            <th>Customer ID</th>
+            <th>Name</th>
+            <th>Last Name</th>
+            <th>Age</th>
+            <th>Country</th>
+            <th>Total Orders</th>
+        </tr>
+        {% for customer in top_orders %}
+        <tr>
+            <td>{{ customer.CustomerId }}</td>
+            <td>{{ customer.Name }}</td>
+            <td>{{ customer.LastName }}</td>
+            <td>{{ customer.Age }}</td>
+            <td>{{ customer.Country }}</td>
+            <td>{{ customer.TotalOrders }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <h2>Top 10 Biggest Spenders</h2>
+    <table>
+        <tr>
+            <th>Customer ID</th>
+            <th>Name</th>
+            <th>Last Name</th>
+            <th>Age</th>
+            <th>Country</th>
+            <th>Total Spent ($)</th>
+        </tr>
+        {% for customer in top_spenders %}
+        <tr>
+            <td>{{ customer.CustomerId }}</td>
+            <td>{{ customer.Name }}</td>
+            <td>{{ customer.LastName }}</td>
+            <td>{{ customer.Age }}</td>
+            <td>{{ customer.Country }}</td>
+            <td>{{ customer.TotalSpent }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+</body>
+</html>
