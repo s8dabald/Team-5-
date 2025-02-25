@@ -2,7 +2,7 @@ from flask import Flask, request, render_template, redirect, url_for, jsonify
 from data_analysis import get_dashboard_data, get_loyal_customers
 from database_manager import execute_db_query
 from employee_anlaysis import get_employee_distributions
-from market_basket_analysis import get_top_combinations
+from recommendation_engine import get_most_common_customer_combinations, get_combinations_for_item
 
 # Create the Flask app
 app = Flask(__name__)
@@ -188,22 +188,19 @@ def save_offers():
         
 # ---------------------- Recommendation Engine ----------------------
 
-@app.route('/recommendation_engine', methods=['GET'])
-def recommendation_engine():
-    result, status = get_top_combinations(execute_db_query)
-    return jsonify(result), status
+@app.route('/recommendation_engine/', methods=['GET'])
+def order_combinations():
+    """Displays the most common order combinations."""
+    top_combinations = get_most_common_customer_combinations("holzbau.db")
+    return render_template('order_combinations.html', top_combinations=top_combinations)
 
-@app.route('/recommendation_engine/items', methods=['GET'])
-def recommendation_engine_items():
-    return jsonify(get_all_items(execute_db_query))
 
-@app.route('/recommendation_engine/item', methods=['GET'])
-def recommendation_engine_item():
-    item = request.args.get('item')
-    if not item:
-        return jsonify({"error": "Item parameter is required"}), 400
-    result, status = get_item_combinations(execute_db_query, item)
-    return jsonify(result), status
+@app.route('/recommendation_engine/search', methods=['POST'])
+def search_order_combinations():
+    """Finds the most common combinations including a specific item."""
+    item = request.form['item'].strip().lower()
+    top_combinations = get_combinations_for_item("holzbau.db", item)
+    return render_template('order_combinations.html', top_combinations=top_combinations, search_item=item)
 
 # Start the Flask server
 if __name__ == '__main__':
