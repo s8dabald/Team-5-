@@ -66,12 +66,21 @@ def get_combinations_for_item(db_path, item, top_n=5):
         combination_counts = Counter()
         for items in customer_orders.values():
             if item in items:
+                # Remove the searched item to only count combinations with other items
                 sorted_items = sorted(items)
                 sorted_items.remove(item)
-                for r in range(1, len(sorted_items) + 1):  # Only count actual combinations
-                    for combo in combinations(sorted_items, r):
-                        combination_counts[", ".join(combo)] += 1
 
+                # Now find all combinations of the remaining items for this customer
+                customer_combos = set()  # Ensure combinations are unique for this customer
+                for r in range(1, len(sorted_items) + 1):  # Generate combinations
+                    for combo in combinations(sorted_items, r):
+                        customer_combos.add(frozenset(combo))  # Use frozenset to prevent duplicates
+
+                # Add unique combinations for the customer to the global counter
+                for combo in customer_combos:
+                    combination_counts[", ".join(sorted(combo))] += 1
+
+        # Get most common combinations
         most_common = combination_counts.most_common(top_n)
 
         return most_common
@@ -82,20 +91,3 @@ def get_combinations_for_item(db_path, item, top_n=5):
     finally:
         if conn:
             conn.close()
-
-
-if __name__ == "__main__":
-    db_path = "holzbau.db"  # Adjust if the database is in another directory
-
-    choice = input("Do you want to search for a specific item? (yes/no): ").strip().lower()
-    if choice == "yes":
-        item = input("Enter the item name: ").strip()
-        top_combinations = get_combinations_for_item(db_path, item)
-        print(f"Most common combinations with '{item}':")
-    else:
-        top_combinations = get_most_common_customer_combinations(db_path)
-        print("Most common customer purchase combinations:")
-
-    for item, count in top_combinations:
-        print(f"{item}: {count} times")
-
