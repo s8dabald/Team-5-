@@ -1,6 +1,7 @@
 from flask import Flask, request, render_template, redirect, url_for, jsonify
 from data_analysis import get_dashboard_data, get_loyal_customers
 from database_manager import execute_db_query
+from market_basket_analysis import get_top_combinations
 
 # Create the Flask app
 app = Flask(__name__)
