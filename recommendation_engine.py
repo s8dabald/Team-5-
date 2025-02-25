@@ -41,8 +41,8 @@ def get_most_common_customer_combinations(db_path, top_n=5):
             conn.close()
 
 
-def get_combinations_for_item(db_path, item):
-    """Finds all item combinations that include a specific item."""
+def get_combinations_for_item(db_path, item, top_n=5):
+    """Finds the most common item combinations that include a specific item."""
     try:
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
@@ -80,8 +80,10 @@ def get_combinations_for_item(db_path, item):
                 for combo in customer_combos:
                     combination_counts[", ".join(sorted(combo))] += 1
 
-        # Return all combinations, not just the top_n
-        return combination_counts
+        # Get most common combinations
+        most_common = combination_counts.most_common(top_n)
+
+        return most_common
 
     except sqlite3.Error as e:
         print(f"Database error: {e}")
