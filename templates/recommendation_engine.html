@@ -3,87 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Recommendation Engine</title>
+    <title>Order Combinations</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
+        table, th, td {
+            border: 1px solid black;
+            border-collapse: collapse;
         }
-
-        h2 {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .search-container {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .search-container input {
+        th, td {
             padding: 10px;
-            font-size: 16px;
-            width: 300px;
-            margin-right: 10px;
+            text-align: left;
         }
-
-        .search-container button {
-            padding: 10px;
-            font-size: 16px;
-        }
-
-        .combinations-list {
-            list-style-type: none;
-            padding: 0;
-        }
-
-        .combinations-list li {
-            background-color: #f9f9f9;
-            border: 1px solid #ddd;
-            margin: 5px 0;
-            padding: 10px;
-            border-radius: 5px;
-        }
-
-        .combination-item {
-            font-weight: bold;
-        }
-
-        .combination-count {
-            font-style: italic;
-            color: gray;
+        input, button {
+            margin: 10px;
+            padding: 8px;
         }
     </style>
 </head>
 <body>
 
-<h2>Order Combinations</h2>
-
-<!-- Search Form -->
-<div class="search-container">
+    <!-- New Item Search Form -->
+    <h2>Enter any Item to see the most common combinations for it:</h2>
     <form method="POST" action="/recommendation_engine/search">
-        <input type="text" name="item" placeholder="Search for an item" value="{{ search_item or '' }}">
+        <input type="text" name="item" id="item" placeholder="Enter item..." required>
         <button type="submit">Search</button>
     </form>
-</div>
 
-<!-- Displaying Top Combinations -->
-<div class="combinations-container">
-    {% if top_combinations %}
-        <h3>Most Common Combinations:</h3>
-        <ul class="combinations-list">
-            {% for combination, count in top_combinations %}
-                <li>
-                    <span class="combination-item">{{ combination }}</span>
-                    <span class="combination-count">({{ count }} times)</span>
-                </li>
+    <!-- Display Search Results -->
+    {% if search_item %}
+    <h3>Most common combinations for item: "{{ search_item }}"</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Combination</th>
+                <th>Absolute Count</th>
+                <th>Relative Count</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for combo, abs_count in top_combinations %}
+            <tr>
+                <td>{{ combo }}</td>
+                <td>{{ abs_count }}</td>
+                <td>{{ (abs_count / total_combinations * 100) | round(2) }}%</td>
+            </tr>
             {% endfor %}
-        </ul>
-    {% else %}
-        <p>No combinations found.</p>
+        </tbody>
+    </table>
     {% endif %}
-</div>
+
+    <!-- Existing Table for Most Common Combinations -->
+    <h3>Most common order combinations:</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Combination</th>
+                <th>Count</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for combo, count in top_combinations %}
+            <tr>
+                <td>{{ combo }}</td>
+                <td>{{ count }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 
 </body>
 </html>
-
