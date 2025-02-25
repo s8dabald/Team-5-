@@ -1,6 +1,7 @@
 from flask import Flask, request, render_template, redirect, url_for, jsonify
 from data_analysis import get_dashboard_data, get_loyal_customers
 from database_manager import execute_db_query
+from employee_anlaysis import get_employee_distributions
 
 # Create the Flask app
 app = Flask(__name__)
@@ -19,6 +20,7 @@ def home():
 def get_customers(): #displays customers
     query = "SELECT * FROM Customer_DB"  # Query to select all customers
     customers = execute_db_query(query, as_dict= True)  # Call the execute_db_query function to fetch customers
+    print(customers)
     return render_template('customers.html', customers=customers)
 
 
@@ -143,7 +145,12 @@ def dashboard():
                            popular_products=popular_products, segments=segments,
                            sales_trend=sales_trend)
 
-
+# ---------------------- Employees ------------------------
+@app.route('/employee_analysis')
+def employee():
+    employee_country_distribution, employee_job_distribution = get_employee_distributions()
+    return render_template("employees.html", employee_country_distribution=employee_country_distribution,
+                           employee_job_distribution=employee_job_distribution)
 
 # ---------------------- Offers ----------------------
 @app.route('/offers', methods=['GET']) #to display current offer settings & the email_log

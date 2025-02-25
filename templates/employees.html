@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Analytics</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            /* padding: 20px; */
+        text-align: center;
+    }
+
+    .navbar {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background-color: #007bff;
+        color: white;
+        padding: 15px;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+    }
+
+    .navbar h1 {
+        margin: 0;
+        font-size: 24px;
+        flex-grow: 1;
+        text-align: center;
+    }
+    
+    .back-btn {
+        position: absolute;
+        left: 20px;
+        background: white;
+        color: #007bff;
+        border: none;
+        padding: 8px 15px;
+        font-size: 16px;
+        font-weight: bold;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: 0.3s ease;
+    }
+
+    .back-btn:hover {
+        background: #f0f0f0;
+    }
+    
+    h2 {
+        color: #333;
+    }
+    
+    /* Chart Containers */
+    .charts-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 30px;
+        margin-bottom: 30px;
+    }
+    
+    .chart-box {
+        background: white;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        width: 600px;
+        /* Increased width */
+        height: 400px;
+        /* Increased height */
+        max-width: 100%;
+    }
+    
+    /* Bar charts side by side */
+    .bar-charts {
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+        flex-wrap: wrap;
+    }
+    </style>
+
+</head>
+
+<body>
+    <div class="navbar">
+        <button class="back-btn" onclick="history.back()">&#8592; Back</button>
+        <h1>Employee Analytics</h1>
+    </div>
+
+    <div class="bar-charts">
+        <div>
+            <h2>Employee Distribution by Country</h2>
+            <div class="chart-box">
+                <canvas id="employeeCountryChart"></canvas>
+            </div>
+        </div>
+        <div>
+            <h2>Employee Distribution by Job Role</h2>
+            <div class="chart-box">
+                <canvas id="jobChart"></canvas>
+            </div>
+        </div>
+        <script>
+            // Pass the country distribution from Flask to JavaScript
+            var countryData = {{ employee_country_distribution | tojson }};
+            var jobData = {{ employee_job_distribution | tojson }};
+
+            // Extract labels (countries) and values (counts)
+            var countryLabels = Object.keys(countryData);
+            var countryValues = Object.values(countryData);
+            var jobLabels = Object.keys(jobData);
+            var jobValues = Object.values(jobData)
+
+            // Create Chart.js bar chart
+            var ctx = document.getElementById('employeeCountryChart').getContext('2d');
+            var ptx = document.getElementById('jobChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: countryLabels,
+                    datasets: [{
+                        label: 'Number of Employees',
+                        data: countryValues,
+                        backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+            new Chart(ptx, {
+                type: 'bar',
+                data: {
+                    labels: jobLabels,
+                    datasets: [{
+                        label: 'Number of Employees',
+                        data: jobValues,
+                        backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        </script>
+</body>
+
+</html>
