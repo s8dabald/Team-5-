@@ -192,7 +192,7 @@ def save_offers():
 def order_combinations():
     """Displays the most common order combinations."""
     top_combinations = get_most_common_customer_combinations("holzbau.db")
-    return render_template('order_combinations.html', top_combinations=top_combinations)
+    return render_template('recommendation_engine.html', top_combinations=top_combinations, search_item=None, total_combinations=0)
 
 
 @app.route('/recommendation_engine/search', methods=['POST'])
@@ -200,7 +200,12 @@ def search_order_combinations():
     """Finds the most common combinations including a specific item."""
     item = request.form['item'].strip().lower()
     top_combinations = get_combinations_for_item("holzbau.db", item)
-    return render_template('order_combinations.html', top_combinations=top_combinations, search_item=item)
+
+    # Calculate the total number of combinations to compute the relative percentage
+    total_combinations = sum(count for _, count in top_combinations)
+
+    return render_template('recommendation_engine.html', top_combinations=top_combinations, search_item=item, total_combinations=total_combinations)
+
 
 # Start the Flask server
 if __name__ == '__main__':
