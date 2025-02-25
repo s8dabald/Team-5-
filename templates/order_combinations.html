@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Combinations</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .combinations-list {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .combinations-list li {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .combination-item {
+            font-weight: bold;
+        }
+
+        .combination-count {
+            font-style: italic;
+            color: gray;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Order Combinations</h2>
+
+<div class="combinations-container">
+    {% if top_combinations %}
+        <h3>Most Common Combinations:</h3>
+        <ul class="combinations-list">
+            {% for combination, count in top_combinations %}
+                <li>
+                    <span class="combination-item">{{ combination }}</span>
+                    <span class="combination-count">({{ count }} times)</span>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No combinations found.</p>
+    {% endif %}
+</div>
+
+</body>
+</html>
