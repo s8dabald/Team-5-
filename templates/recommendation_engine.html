@@ -2,49 +2,10 @@
 <html>
 <head>
     <title>Recommendation Engine</title>
-    <script>
-        async function fetchTopCombinations() {
-            const response = await fetch('/recommendation_engine');
-            const data = await response.json();
-            const tableBody = document.getElementById('top-combinations-body');
-            tableBody.innerHTML = '';
-            data.top_combinations.forEach(item => {
-                const row = `<tr><td>${item.items}</td><td>${item.percentage}%</td></tr>`;
-                tableBody.innerHTML += row;
-            });
-        }
-
-        async function fetchItemList() {
-            const response = await fetch('/recommendation_engine/items');
-            const data = await response.json();
-            const dropdown = document.getElementById('item-dropdown');
-            dropdown.innerHTML = '';
-            data.forEach(item => {
-                dropdown.innerHTML += `<option value="${item}">${item}</option>`;
-            });
-        }
-
-        async function fetchItemCombinations() {
-            const selectedItem = document.getElementById('item-dropdown').value;
-            const response = await fetch(`/recommendation_engine/${selectedItem}`);
-            const data = await response.json();
-            const list = document.getElementById('item-combinations');
-            list.innerHTML = '';
-            data.forEach(item => {
-                const listItem = `<li>${item.combination} (${item.percentage}%)</li>`;
-                list.innerHTML += listItem;
-            });
-        }
-
-        window.onload = async function() {
-            await fetchTopCombinations();
-            await fetchItemList();
-        };
-    </script>
 </head>
 <body>
     <h1>Recommendation Engine</h1>
-
+    
     <h2>Most Common Item Combinations</h2>
     <table border="1">
         <thead>
@@ -53,14 +14,32 @@
                 <th>Percentage of Orders</th>
             </tr>
         </thead>
-        <tbody id="top-combinations-body"></tbody>
+        <tbody>
+            {% for combination in top_combinations %}
+            <tr>
+                <td>{{ combination.items }}</td>
+                <td>{{ combination.percentage }}%</td>
+            </tr>
+            {% endfor %}
+        </tbody>
     </table>
 
     <h2>Find Common Combinations for an Item</h2>
-    <select id="item-dropdown" onchange="fetchItemCombinations()">
-        <!-- Options will be filled dynamically -->
-    </select>
-    <ul id="item-combinations"></ul>
-
+    <form method="GET" action="/recommendation_engine/item">
+        <select name="item">
+            {% for item in items %}
+            <option value="{{ item }}">{{ item }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Search</button>
+    </form>
+    
+    {% if item_combinations %}
+    <ul>
+        {% for combination in item_combinations %}
+        <li>{{ combination.combination }} ({{ combination.percentage }}%)</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
 </body>
 </html>

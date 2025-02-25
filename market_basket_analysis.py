@@ -10,7 +10,7 @@ def get_top_combinations(execute_db_query):
         return {"error": "No order data available"}, 500
     
     basket = df.groupby(['OrderId', 'Description']).size().unstack(fill_value=0)
-    basket[basket > 0] = 1
+    basket = basket.applymap(lambda x: 1 if x > 0 else 0)
     
     frequent_itemsets = apriori(basket, min_support=0.3, use_colnames=True)
     if frequent_itemsets.empty:
