@@ -1,54 +1,72 @@
-import pandas as pd
-from mlxtend.frequent_patterns import apriori, association_rules
+from collections import Counter
+from itertools import combinations
 from database_manager import execute_db_query
 
-def get_top_combinations(execute_db_query):
-    query = "SELECT OrderId, Description FROM Order_DB"
-    df = pd.DataFrame(execute_db_query(query), columns=['OrderId', 'Description'])
-    
-    if df.empty:
-        return {"error": "No order data available"}, 500
-    
-    basket = df.groupby(['OrderId', 'Description']).size().unstack(fill_value=0)
-    basket = basket.applymap(lambda x: 1 if x > 0 else 0)
-    
-    frequent_itemsets = apriori(basket, min_support=0.3, use_colnames=True)
-    if frequent_itemsets.empty:
-        return {"error": "Not enough frequent itemsets"}, 500
-    
-    rules = association_rules(frequent_itemsets, metric="lift", min_threshold=1)
-    if rules.empty:
-        return {"error": "No strong associations found"}, 500
-    
-    rules['antecedents'] = rules['antecedents'].apply(lambda x: ', '.join(list(x)))
-    rules['consequents'] = rules['consequents'].apply(lambda x: ', '.join(list(x)))
-    rules['items'] = rules['antecedents'] + ' + ' + rules['consequents']
-    rules['percentage'] = (rules['support'] * 100).round(2)
-    
-    return {"top_combinations": rules[['items', 'percentage']].to_dict(orient='records')}
 
-def get_all_items(execute_db_query):
-    query = "SELECT DISTINCT Description FROM Order_DB"
-    items = [row[0] for row in execute_db_query(query)]
-    return items
+def get_all_items():
+    """Fetch all unique item descriptions from the database for dropdown selection."""
+    query = "SELECT DISTINCT LOWER(Description) FROM Order_DB"
+    result = execute_db_query(query, as_dict=False)  # Fetch data
 
-def get_item_combinations(execute_db_query, item):
-    query = "SELECT OrderId, Description FROM Order_DB"
-    df = pd.DataFrame(execute_db_query(query), columns=['OrderId', 'Description'])
-    
-    if df.empty:
-        return {"error": "No order data available"}, 500
-    
-    basket = df.groupby(['OrderId', 'Description']).size().unstack(fill_value=0)
-    basket[basket > 0] = 1
-    
-    frequent_itemsets = apriori(basket, min_support=0.3, use_colnames=True)
-    rules = association_rules(frequent_itemsets, metric="lift", min_threshold=1)
-    if rules.empty:
-        return {"error": "No strong associations found for this item"}, 500
-    
-    item_rules = rules[rules['antecedents'].apply(lambda x: item in x)]
-    item_rules['consequents'] = item_rules['consequents'].apply(lambda x: ', '.join(list(x)))
-    item_rules['percentage'] = (item_rules['support'] * 100).round(2)
-    
-    return item_rules[['consequents', 'percentage']].head(5).rename(columns={'consequents': 'combination'}).to_dict(orient='records')
+    if result:
+        return sorted(row[0] for row in result)  # Extract and sort item descriptions
+    return []  # Return an empty list if no data
+
+
+def get_most_common_customer_combinations(top_n=10):
+    """Retrieve the most common item combinations across all customers."""
+    query = "SELECT CustomerId, LOWER(Description) FROM Order_DB"
+    orders = execute_db_query(query, as_dict=False)  # Fetch order data
+
+    if not orders:
+        return []  # Return an empty list if no data
+
+    customer_orders = {}
+    for customer_id, description in orders:
+        if customer_id not in customer_orders:
+            customer_orders[customer_id] = set()
+        customer_orders[customer_id].add(description)
+
+    combination_counts = Counter()
+    for items in customer_orders.values():
+        sorted_items = sorted(items)
+        for r in range(2, len(sorted_items) + 1):
+            for combo in combinations(sorted_items, r):
+                combination_counts[", ".join(combo)] += 1
+
+    return combination_counts.most_common(top_n)
+
+
+def get_combinations_for_item( item, top_n=10):
+    """Finds the most common item combinations that include a specific item."""
+    query = "SELECT CustomerId, LOWER(Description) FROM Order_DB"
+    orders = execute_db_query(query, as_dict=False)  # Fetch order data
+
+    if not orders:
+        return [], 0  # Return empty data if no orders found
+
+    customer_orders = {}
+    for customer_id, description in orders:
+        if customer_id not in customer_orders:
+            customer_orders[customer_id] = set()
+        customer_orders[customer_id].add(description)
+
+    item = item.lower()
+    combination_counts = Counter()
+    item_occurrences = 0
+
+    for items in customer_orders.values():
+        if item in items:
+            item_occurrences += 1
+            sorted_items = sorted(items - {item})
+            customer_combos = set()
+            for r in range(1, len(sorted_items) + 1):
+                for combo in combinations(sorted_items, r):
+                    customer_combos.add(frozenset(combo))
+            for combo in customer_combos:
+                combination_counts[", ".join(sorted(combo))] += 1
+
+    most_common = combination_counts.most_common(top_n)
+    relative_frequencies = [(combo, count, round(count / item_occurrences, 2)) for combo, count in most_common]
+
+    return relative_frequencies, item_occurrences
