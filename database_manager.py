@@ -42,27 +42,3 @@ def execute_db_query(query, params=None, as_dict=False):
         connection.close()  # Ensure the connection is always closed
 
 
-def delete_last_logged_mail():
-    """
-    Deletes the most recently logged email from the Email_Log table.
-    Ensures the table isn't empty before attempting the delete.
-    """
-    try:
-        # First, check if there are any records
-        check_query = "SELECT COUNT(*) FROM Email_Log;"
-        result = execute_db_query(check_query)
-
-        # If the table isn't empty, proceed with the delete
-        if result and result[0][0] > 0:
-            delete_query = "DELETE FROM Email_Log WHERE rowid = (SELECT MAX(rowid) FROM Email_Log);"
-            rows_affected = execute_db_query(delete_query)
-
-            if rows_affected:
-                print(f"{rows_affected} row(s) successfully deleted.")
-            else:
-                print("Error deleting the last row.")
-        else:
-            print("No data to delete.")
-
-    except Exception as e:
-        print(f"Error in delete_last_logged_mail: {e}")
