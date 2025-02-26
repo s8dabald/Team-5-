@@ -3,21 +3,6 @@ from collections import Counter
 from itertools import combinations
 from database_manager import execute_db_query  # Ensure this import matches the file where execute_db_query is defined
 
-def get_all_items():
-    """
-    Fetches all unique item descriptions from the database.
-    Used to populate the dropdown menu for product selection.
-
-    Returns:
-        A sorted list of unique product descriptions in lowercase.
-    """
-    # Query to get distinct product descriptions from the Order_DB table
-    query = "SELECT DISTINCT Description FROM Order_DB"
-    # Execute the query and retrieve results as a dictionary
-    products = execute_db_query(query, as_dict=True)
-    # Return a list of unique product descriptions
-    return [product["Description"] for product in products]
-
 def get_most_common_customer_combinations(top_n=10):
     """
     Retrieves the most frequently occurring item combinations across all customers.
