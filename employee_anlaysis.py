@@ -1,5 +1,4 @@
 import pandas as pd
-from sklearn.cluster import KMeans
 from database_manager import execute_db_query
 
 def get_employee_data():#to get data from DB
