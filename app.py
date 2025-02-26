@@ -188,23 +188,37 @@ def save_offers():
         
 # ---------------------- Recommendation Engine ----------------------
 
+# Fetch unique products for dropdown
+def get_unique_products():
+    query = "SELECT DISTINCT Description FROM Order_DB"
+    products = execute_db_query(query, as_dict=True)
+    return [product["Description"] for product in products]
+
 @app.route('/recommendation_engine/', methods=['GET'])
 def order_combinations():
-    """Displays the most common order combinations."""
-    top_combinations = get_most_common_customer_combinations("holzbau.db")
-    return render_template('recommendation_engine.html', top_combinations=top_combinations, search_item=None, total_combinations=0)
-
+    """Displays the static chart and the search form."""
+    static_combinations = get_most_common_customer_combinations("holzbau.db")
+    product_list = get_unique_products()
+    # For startup sequence of the page:
+    return render_template('recommendation_engine.html',
+                           static_combinations=static_combinations,
+                           product_list=product_list,
+                           search_item=None)
 
 @app.route('/recommendation_engine/search', methods=['POST'])
 def search_order_combinations():
-    """Finds the most common combinations including a specific item."""
     item = request.form['item'].strip().lower()
-    top_combinations = get_combinations_for_item("holzbau.db", item)
-
-    # Calculate the total number of combinations to compute the relative percentage
-    total_combinations = sum(count for _, count in top_combinations)
-
-    return render_template('recommendation_engine.html', top_combinations=top_combinations, search_item=item, total_combinations=total_combinations)
+    relative_frequencies, item_occurrences = get_combinations_for_item("holzbau.db", item)
+    search_top_combinations = [(combo, count) for combo, count, _ in relative_frequencies]
+    static_combinations = get_most_common_customer_combinations("holzbau.db")
+    product_list = get_unique_products()
+    total_combinations = item_occurrences
+    return render_template('recommendation_engine.html',
+                           static_combinations=static_combinations,
+                           product_list=product_list,
+                           search_item=item,
+                           search_top_combinations=search_top_combinations,
+                           total_combinations=total_combinations)
 
 
 # Start the Flask server
