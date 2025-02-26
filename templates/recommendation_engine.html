@@ -1,74 +1,187 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Order Combinations</title>
-    <style>
-        table, th, td {
-            border: 1px solid black;
-            border-collapse: collapse;
-        }
-        th, td {
-            padding: 10px;
-            text-align: left;
-        }
-        input, button {
-            margin: 10px;
-            padding: 8px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Combinations</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    table, th, td {
+      border: 1px solid black;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 10px;
+      text-align: left;
+    }
+    input, button, select {
+      margin: 10px;
+      padding: 8px;
+    }
+  </style>
 </head>
 <body>
+  <!-- bar chart -->
+  <h3>The 10 most common order combinations:</h3>
+  <canvas id="staticChart" width="640" height="320"></canvas>
 
-    <!-- New Item Search Form -->
-    <h2>Enter any Item to see the most common combinations for it:</h2>
-    <form method="POST" action="/recommendation_engine/search">
-        <input type="text" name="item" id="item" placeholder="Enter item..." required>
-        <button type="submit">Search</button>
-    </form>
+  <script>
+    // prepare data for bar chart
+    const staticLabels = [
+      {% for combo, count in static_combinations %}
+        "{{ combo }}",
+      {% endfor %}
+    ];
+    const staticData = [
+      {% for combo, count in static_combinations %}
+        {{ count }},
+      {% endfor %}
+    ];
 
-    <!-- Display Search Results -->
-    {% if search_item %}
-    <h3>Most common combinations for item: "{{ search_item }}"</h3>
-    <table>
-        <thead>
-            <tr>
-                <th>Combination</th>
-                <th>Absolute Count</th>
-                <th>Relative Count</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for combo, abs_count in top_combinations %}
-            <tr>
-                <td>{{ combo }}</td>
-                <td>{{ abs_count }}</td>
-                <td>{{ (abs_count / total_combinations * 100) | round(2) }}%</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    {% endif %}
+    // initialize the bar chart
+    const ctx = document.getElementById('staticChart').getContext('2d');
+    const staticChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: staticLabels,
+        datasets: [{
+          label: 'Anzahl der Kombinationen',
+          data: staticData,
+          backgroundColor: 'rgba(54, 162, 235, 0.5)',
+          borderColor: 'rgba(54, 162, 235, 1)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              stepSize: 1
+            }
+          }
+        }
+      }
+    });
+  </script>
 
-    <!-- Existing Table for Most Common Combinations -->
-    <h3>Most common order combinations:</h3>
-    <table>
-        <thead>
-            <tr>
-                <th>Combination</th>
-                <th>Count</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for combo, count in top_combinations %}
-            <tr>
-                <td>{{ combo }}</td>
-                <td>{{ count }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+  <!-- Dropdown for item selection -->
+  <h3>Select an item to see its common combinations:</h3>
+  <form action="{{ url_for('search_order_combinations') }}" method="post">
+      <label for="item">Choose an item:</label>
+      <select name="item" id="item" required>
+        <option value="" disabled {% if not search_item %}selected{% endif %}>choose item</option>
+        {% for product in product_list %}
+          <option value="{{ product }}" {% if search_item == product.lower() %}selected{% endif %}>{{ product }}</option>
+        {% endfor %}
+      </select>
+      <button type="submit">Search</button>
+  </form>
 
+  <!-- Search results as table -->
+  {% if search_item %}
+  <h3>Most common order combinations for: {{ search_item }}</h3>
+  <table>
+      <thead>
+          <tr>
+              <th>Combination</th>
+              <th>Count</th>
+              <th>Percentage</th>
+          </tr>
+      </thead>
+      <tbody>
+          {% for combo, count in search_top_combinations %}
+          <tr>
+              <td>{{ combo }}</td>
+              <td>{{ count }}</td>
+              <td>{{ (count / total_combinations * 100)|round(2) }}%</td>
+          </tr>
+          {% endfor %}
+      </tbody>
+  </table>
+
+ <!-- Shows the total amount of orders for the item -->
+<p><strong>Total Orders including {{ search_item }}: {{ total_combinations }}</strong></p>
+
+
+<!-- Polar Area Chart for search results -->
+<h3>Polar Area Chart for: {{ search_item }}</h3>
+<canvas id="polarChart" width="640" height="320"></canvas>
+<script>
+
+  // generate labels and data from search results
+  const polarLabels = [
+    {% for combo, count in search_top_combinations %}
+      "{{ combo }}",
+    {% endfor %}
+  ];
+  const polarData = [
+    {% for combo, count in search_top_combinations %}
+      {{ count }},
+    {% endfor %}
+  ];
+
+  const blueBackgroundColors = [
+    '#0d47a1', // sehr dunkel
+    '#1565c0',
+    '#1976d2',
+    '#1e88e5',
+    '#2196f3',
+    '#42a5f5',
+    '#64b5f6',
+    '#90caf9',
+    '#bbdefb',
+    '#e3f2fd'
+  ];
+
+  // Use as many colors as datapoints (for the case datapoints is <10
+  const datasetColors = blueBackgroundColors.slice(0, polarData.length);
+
+  // Plugin, that draws the r-Skala retrospectively so its in the foreground and always readable
+  const foregroundScalePlugin = {
+    id: 'foregroundScalePlugin',
+    afterDatasetsDraw(chart, args, options) {
+      chart.scales.r.draw();
+    }
+  };
+
+  const ctxPolar = document.getElementById('polarChart').getContext('2d');
+  new Chart(ctxPolar, {
+    type: 'polarArea',
+    data: {
+      labels: polarLabels,
+      datasets: [{
+        label: 'Counts',
+        data: polarData,
+        backgroundColor: datasetColors,
+        borderColor: datasetColors,
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        r: {
+          ticks: {
+            display: true,
+            color: 'black',
+            backdropColor: 'rgba(255, 255, 255, 0.8)',
+            padding: 5
+          },
+          grid: {
+            color: 'rgba(0, 0, 0, 0.2)'
+          },
+          title: {
+            display: true,
+            text: 'Count',
+            color: 'black'
+          }
+        }
+      }
+    },
+    plugins: [foregroundScalePlugin]
+  });
+</script>
+{% endif %}
 </body>
 </html>
