@@ -3,25 +3,25 @@ from collections import Counter
 from itertools import combinations
 from database_manager import execute_db_query  # Ensure this import matches the file where execute_db_query is defined
 
-def get_all_items(db_path):
+def get_all_items():
     """
     Fetches all unique item descriptions from the database.
     Used to populate the dropdown menu for product selection.
 
-    - db_path: Path to the SQLite database file.
-
     Returns:
         A sorted list of unique product descriptions in lowercase.
     """
-    query = "SELECT DISTINCT LOWER(Description) FROM Order_DB"
-    results = execute_db_query(query)
-    return sorted([row[0] for row in results]) if results else []
+    # Query to get distinct product descriptions from the Order_DB table
+    query = "SELECT DISTINCT Description FROM Order_DB"
+    # Execute the query and retrieve results as a dictionary
+    products = execute_db_query(query, as_dict=True)
+    # Return a list of unique product descriptions
+    return [product["Description"] for product in products]
 
-def get_most_common_customer_combinations(db_path, top_n=10):
+def get_most_common_customer_combinations(top_n=10):
     """
     Retrieves the most frequently occurring item combinations across all customers.
 
-    - db_path: Path to the SQLite database file.
     - top_n: The number of most common combinations to return.
 
     Returns:
@@ -50,11 +50,10 @@ def get_most_common_customer_combinations(db_path, top_n=10):
 
     return combination_counts.most_common(top_n)
 
-def get_combinations_for_item(db_path, item, top_n=10):
+def get_combinations_for_item(item, top_n=10):
     """
     Finds the most frequently occurring item combinations that include a given item.
 
-    - db_path: Path to the SQLite database file.
     - item: The product name to search for (case insensitive).
     - top_n: The number of top combinations to return.
 
@@ -97,11 +96,10 @@ def get_combinations_for_item(db_path, item, top_n=10):
 
     return relative_frequencies, item_occurrences
 
-def get_recommendations_for_cart(db_path, items, top_n=10):
+def get_recommendations_for_cart(items, top_n=10):
     """
     Identifies additional items frequently purchased by customers who ordered all items in a given shopping cart.
 
-    - db_path: Path to the SQLite database file.
     - items: A list of product names representing the shopping cart.
     - top_n: The number of recommendations to return.
 

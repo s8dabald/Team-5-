@@ -3,7 +3,7 @@ from services.data_analysis import get_dashboard_data, get_loyal_customers
 from database_manager import execute_db_query
 from services.employee_analysis import get_employee_distributions
 from services.recommendation_engine import get_most_common_customer_combinations, get_combinations_for_item, \
-    get_recommendations_for_cart
+    get_recommendations_for_cart, get_all_items
 
 # Initialize the Flask application
 app = Flask(__name__)
@@ -201,23 +201,13 @@ def save_offers():
 
 # ---------------------- Recommendation Engine ----------------------
 
-# Fetch unique products for dropdown
-def get_unique_products():
-    # Query to get distinct product descriptions from the Order_DB table
-    query = "SELECT DISTINCT Description FROM Order_DB"
-    # Execute the query and retrieve results as a dictionary
-    products = execute_db_query(query, as_dict=True)
-    # Return a list of unique product descriptions
-    return [product["Description"] for product in products]
-
-
 @app.route('/recommendation_engine/', methods=['GET'])
 def order_combinations():
     """Displays the static chart and the search form."""
     # Retrieve the most common customer order combinations from the database
-    static_combinations = get_most_common_customer_combinations("holzbau.db")
+    static_combinations = get_most_common_customer_combinations()
     # Fetch the list of unique products for the dropdown menu
-    product_list = get_unique_products()
+    product_list = get_all_items()
 
     # Render the recommendation_engine.html template with initial data
     return render_template('recommendation_engine.html',
@@ -233,16 +223,16 @@ def search_order_combinations():
     item = request.form['item'].strip().lower()
 
     # Retrieve order combinations and occurrence data for the selected item
-    relative_frequencies, item_occurrences = get_combinations_for_item("holzbau.db", item)
+    relative_frequencies, item_occurrences = get_combinations_for_item( item)
 
     # Extract the top combinations and their counts
     search_top_combinations = [(combo, count) for combo, count, _ in relative_frequencies]
 
     # Retrieve static most common customer order combinations for display
-    static_combinations = get_most_common_customer_combinations("holzbau.db")
+    static_combinations = get_most_common_customer_combinations()
 
     # Fetch unique product list for the dropdown menu
-    product_list = get_unique_products()
+    product_list = get_all_items()
 
     # Get the total occurrences of the selected item in order combinations
     total_combinations = item_occurrences
@@ -269,10 +259,10 @@ def search_cart_combinations():
 
     # If no items are selected, return an error message
     if not selected_items:
-        product_list = get_unique_products()
+        product_list = get_all_items()
         error_message = "Bitte wählen Sie mindestens ein Item aus."  # German: "Please select at least one item."
         return render_template('recommendation_engine.html',
-                               static_combinations=get_most_common_customer_combinations("holzbau.db"),
+                               static_combinations=get_most_common_customer_combinations(),
                                product_list=product_list,
                                error=error_message)
 
@@ -280,14 +270,14 @@ def search_cart_combinations():
     cart_items_str = ", ".join(selected_items)
 
     # Get recommendations based on selected cart items
-    recommendations, cart_customers = get_recommendations_for_cart("holzbau.db", selected_items)
+    recommendations, cart_customers = get_recommendations_for_cart(selected_items)
 
     # Fetch unique product list for the dropdown menu
-    product_list = get_unique_products()
+    product_list = get_all_items()
 
     # Render the template with cart recommendations
     return render_template('recommendation_engine.html',
-                           static_combinations=get_most_common_customer_combinations("holzbau.db"),
+                           static_combinations=get_most_common_customer_combinations(),
                            product_list=product_list,
                            search_cart_recommendations=recommendations,
                            cart_customers=cart_customers,
