@@ -1,7 +1,7 @@
 from flask import Flask, request, render_template, redirect, url_for, jsonify
 from data_analysis import get_dashboard_data, get_loyal_customers
 from database_manager import execute_db_query
-from employee_anlaysis import get_employee_distributions
+from employee_analysis import get_employee_distributions
 from recommendation_engine import get_most_common_customer_combinations, get_combinations_for_item
 
 # Initialize the Flask application

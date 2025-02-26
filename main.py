@@ -1,6 +1,6 @@
 import threading
 from app import app
-import offers
+import offer_manager
 
 # Function to run the Flask application
 def run_flask_app():
