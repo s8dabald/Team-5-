@@ -23,6 +23,13 @@
             color: #333; /* Example text color */
         }
 
+        /* CSS für den aktiven Navigationslink */
+        nav a.active {
+            box-shadow: inset 5px 0 0 0 #000;  /* Innerer Schatten links */
+            background-color: #e3f2fd;          /* Heller Hintergrund */
+            font-weight: bold;
+        }
+
         #content {
             flex: 1; /* Make content area take up remaining space */
             padding: 20px;
@@ -41,18 +48,34 @@
 
     <nav>
         <h1>Holzbau</h1>
-        <a href="/dashboard" target="contentFrame">Dashboard</a>
-        <a href="/customers" target="contentFrame">Customers</a>
-        <a href="/recommendations" target="contentFrame">Recommendations</a>
-        <a href="/orders" target="contentFrame">Orders</a>
-        <a href="/offers" target="contentFrame">Offers</a>
-        <a href="/loyal_customers" target="contentFrame">Top Customers</a>
-        <a href="/recommendation_engine" target="contentFrame">Recommendation Engine</a>
-        <a href="/employee_analysis" target="contentFrame">Employee Analytics</a>
+        <a href="/dashboard" target="contentFrame" class="{% if request.path == '/dashboard' %}active{% endif %}">Dashboard</a>
+        <a href="/customers" target="contentFrame" class="{% if request.path == '/customers' %}active{% endif %}">Customers</a>
+        <a href="/recommendations" target="contentFrame" class="{% if request.path == '/recommendations' %}active{% endif %}">Recommendations</a>
+        <a href="/orders" target="contentFrame" class="{% if request.path == '/orders' %}active{% endif %}">Orders</a>
+        <a href="/offers" target="contentFrame" class="{% if request.path == '/offers' %}active{% endif %}">Offers</a>
+        <a href="/loyal_customers" target="contentFrame" class="{% if request.path == '/loyal_customers' %}active{% endif %}">Top Customers</a>
+        <a href="/recommendation_engine/" target="contentFrame" class="{% if request.path == '/recommendation_engine/' %}active{% endif %}">Recommendation Engine</a>
+        <a href="/employee_analysis" target="contentFrame" class="{% if request.path == '/employee_analysis' %}active{% endif %}">Employee Analytics</a>
     </nav>
 
     <div id="content">
-        <iframe name="contentFrame"></iframe>  </div>
+        <iframe name="contentFrame" src="/dashboard"></iframe>
+    </div>
+
+    <script>
+        // Füge einen Listener hinzu, der beim Laden des iFrames den aktuellen Pfad ermittelt
+        document.querySelector('iframe[name="contentFrame"]').addEventListener('load', function() {
+    let iframePath = this.contentWindow.location.pathname;
+    document.querySelectorAll('nav a').forEach(link => {
+        link.classList.remove('active');
+        // Verwende startsWith, um zu prüfen, ob der iframePath mit dem href-Wert beginnt
+        if(iframePath.startsWith(link.getAttribute('href'))) {
+            link.classList.add('active');
+        }
+    });
+});
+
+    </script>
 
 </body>
 </html>
