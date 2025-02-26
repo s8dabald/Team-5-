@@ -1,78 +1,78 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Top Customers</title>
+    <meta charset="UTF-8"> <!-- Specifies the character encoding for the document -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Ensures proper scaling on mobile devices -->
+    <title>Top Customers</title> <!-- The title of the page displayed in the browser tab -->
     <style>
         body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
+            font-family: Arial, sans-serif; /* Sets the font family for the page */
+            margin: 20px; /* Adds margin around the body content */
         }
         table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 30px;
+            width: 100%; /* Makes the table take up the full width of its container */
+            border-collapse: collapse; /* Collapses table borders into one */
+            margin-bottom: 30px; /* Adds space below the table */
         }
         th, td {
-            border: 1px solid black;
-            padding: 10px;
-            text-align: left;
+            border: 1px solid black; /* Adds a black border to table cells */
+            padding: 10px; /* Adds padding inside table cells */
+            text-align: left; /* Aligns text to the left within cells */
         }
         th {
-            background-color: #f4f4f4;
+            background-color: #f4f4f4; /* Sets a light gray background color for table headers */
         }
         h2 {
-            margin-top: 20px;
+            margin-top: 20px; /* Adds space above the section heading */
         }
     </style>
 </head>
 <body>
 
-    <h1>Top 10 Customers</h1>
+    <h1>Top 10 Customers</h1> <!-- Main title for the page -->
 
-    <h2>Top 10 by Most Orders</h2>
+    <h2>Top 10 by Most Orders</h2> <!-- Subheading for the "Most Orders" table -->
     <table>
         <tr>
-            <th>Customer ID</th>
-            <th>Name</th>
-            <th>Last Name</th>
-            <th>Age</th>
-            <th>Country</th>
-            <th>Total Orders</th>
+            <th>Customer ID</th> <!-- Table header for Customer ID -->
+            <th>Name</th> <!-- Table header for Customer Name -->
+            <th>Last Name</th> <!-- Table header for Customer Last Name -->
+            <th>Age</th> <!-- Table header for Customer Age -->
+            <th>Country</th> <!-- Table header for Customer Country -->
+            <th>Total Orders</th> <!-- Table header for Total Orders -->
         </tr>
-        {% for customer in top_orders %}
+        {% for customer in top_orders %} <!-- Loop through top_orders data passed from backend -->
         <tr>
-            <td>{{ customer.CustomerId }}</td>
-            <td>{{ customer.Name }}</td>
-            <td>{{ customer.LastName }}</td>
-            <td>{{ customer.Age }}</td>
-            <td>{{ customer.Country }}</td>
-            <td>{{ customer.TotalOrders }}</td>
+            <td>{{ customer.CustomerId }}</td> <!-- Display Customer ID -->
+            <td>{{ customer.Name }}</td> <!-- Display Customer Name -->
+            <td>{{ customer.LastName }}</td> <!-- Display Customer Last Name -->
+            <td>{{ customer.Age }}</td> <!-- Display Customer Age -->
+            <td>{{ customer.Country }}</td> <!-- Display Customer Country -->
+            <td>{{ customer.TotalOrders }}</td> <!-- Display Total Orders -->
         </tr>
-        {% endfor %}
+        {% endfor %} <!-- End of the loop through top_orders -->
     </table>
 
-    <h2>Top 10 Biggest Spenders</h2>
+    <h2>Top 10 Biggest Spenders</h2> <!-- Subheading for the "Biggest Spenders" table -->
     <table>
         <tr>
-            <th>Customer ID</th>
-            <th>Name</th>
-            <th>Last Name</th>
-            <th>Age</th>
-            <th>Country</th>
-            <th>Total Spent ($)</th>
+            <th>Customer ID</th> <!-- Table header for Customer ID -->
+            <th>Name</th> <!-- Table header for Customer Name -->
+            <th>Last Name</th> <!-- Table header for Customer Last Name -->
+            <th>Age</th> <!-- Table header for Customer Age -->
+            <th>Country</th> <!-- Table header for Customer Country -->
+            <th>Total Spent ($)</th> <!-- Table header for Total Money Spent -->
         </tr>
-        {% for customer in top_spenders %}
+        {% for customer in top_spenders %} <!-- Loop through top_spenders data passed from backend -->
         <tr>
-            <td>{{ customer.CustomerId }}</td>
-            <td>{{ customer.Name }}</td>
-            <td>{{ customer.LastName }}</td>
-            <td>{{ customer.Age }}</td>
-            <td>{{ customer.Country }}</td>
-            <td>{{ customer.TotalSpent }}</td>
+            <td>{{ customer.CustomerId }}</td> <!-- Display Customer ID -->
+            <td>{{ customer.Name }}</td> <!-- Display Customer Name -->
+            <td>{{ customer.LastName }}</td> <!-- Display Customer Last Name -->
+            <td>{{ customer.Age }}</td> <!-- Display Customer Age -->
+            <td>{{ customer.Country }}</td> <!-- Display Customer Country -->
+            <td>{{ customer.TotalSpent }}</td> <!-- Display Total Money Spent -->
         </tr>
-        {% endfor %}
+        {% endfor %} <!-- End of the loop through top_spenders -->
     </table>
 
 </body>

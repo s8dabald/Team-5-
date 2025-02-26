@@ -1,43 +1,56 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Customers</title>
+    <title>Customers</title> <!-- The title of the page that appears in the browser tab -->
 </head>
 <body>
-    <h1>Customers</h1>
+    <h1>Customers</h1> <!-- Main heading of the page -->
+
+    <!-- Form to add a new customer -->
     <form action="/customers/add" method="POST">
-        <input type="text" name="Name" placeholder="Name" required>
-        <input type="text" name="LastName" placeholder="Last Name" required>
-        <input type="number" name="Age" placeholder="Age" required>
-        <input type="text" name="Country" placeholder="Country" required>
-        <button type="submit">Add Customer</button>
+        <input type="text" name="Name" placeholder="Name" required> <!-- Input field for the customer's name -->
+        <input type="text" name="LastName" placeholder="Last Name" required> <!-- Input field for the customer's last name -->
+        <input type="number" name="Age" placeholder="Age" required> <!-- Input field for the customer's age -->
+        <input type="text" name="Country" placeholder="Country" required> <!-- Input field for the customer's country -->
+        <button type="submit">Add Customer</button> <!-- Button to submit the form and add a new customer -->
     </form>
-    <table border="1">
+
+    <!-- Table to display existing customers -->
+    <table border="1"> <!-- Table with a border of 1px -->
         <tr>
+            <!-- Table headers -->
             <th>ID</th><th>Name</th><th>Last Name</th><th>Age</th><th>Country</th><th>Actions</th>
         </tr>
+
+        <!-- Loop to display each customer from the `customers` list -->
         {% for customer in customers %}
         <tr>
-            <td>{{ customer.CustomerId }}</td>
-            <td>{{ customer.Name }}</td>
-            <td>{{ customer.LastName }}</td>
-            <td>{{ customer.Age }}</td>
-            <td>{{ customer.Country }}</td>
+            <!-- Display customer information -->
+            <td>{{ customer.CustomerId }}</td> <!-- Customer ID -->
+            <td>{{ customer.Name }}</td> <!-- Customer name -->
+            <td>{{ customer.LastName }}</td> <!-- Customer last name -->
+            <td>{{ customer.Age }}</td> <!-- Customer age -->
+            <td>{{ customer.Country }}</td> <!-- Customer country -->
             <td>
+                <!-- Form to edit a customer -->
                 <form action="/customers/edit/{{ customer.CustomerId }}" method="POST" style="display:inline;">
-                    <input type="text" name="Name" value="{{ customer.Name }}" required>
-                    <input type="text" name="LastName" value="{{ customer.LastName }}" required>
-                    <input type="number" name="Age" value="{{ customer.Age }}" required>
-                    <input type="text" name="Country" value="{{ customer.Country }}" required>
-                    <button type="submit">Edit</button>
+                    <input type="text" name="Name" value="{{ customer.Name }}" required> <!-- Input field for editing name -->
+                    <input type="text" name="LastName" value="{{ customer.LastName }}" required> <!-- Input field for editing last name -->
+                    <input type="number" name="Age" value="{{ customer.Age }}" required> <!-- Input field for editing age -->
+                    <input type="text" name="Country" value="{{ customer.Country }}" required> <!-- Input field for editing country -->
+                    <button type="submit">Edit</button> <!-- Button to submit the form and edit the customer -->
                 </form>
+
+                <!-- Form to delete a customer -->
                 <form action="/customers/delete/{{ customer.CustomerId }}" method="POST" style="display:inline;">
-                    <button type="submit">Delete</button>
+                    <button type="submit">Delete</button> <!-- Button to submit the form and delete the customer -->
                 </form>
             </td>
         </tr>
         {% endfor %}
     </table>
+
+    <!-- Link to go back to the home page -->
     <a href="/">Back to Home</a>
 </body>
 </html>

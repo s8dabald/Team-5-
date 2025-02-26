@@ -1,46 +1,57 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Orders</title>
+    <title>Orders</title> <!-- Title of the page displayed in the browser tab -->
 </head>
 <body>
-    <h1>Orders</h1>
+    <h1>Orders</h1> <!-- Main heading for the page -->
+
+    <!-- Form to add a new order -->
     <form action="/orders/add" method="POST">
-        <input type="number" name="CustomerId" placeholder="Customer ID" required>
-        <input type="text" name="Description" placeholder="Description" required>
-        <input type="number" name="Price" step="0.01" placeholder="Price" required>
-        <input type="number" name="Amount" placeholder="Amount" required>
-        <input type="date" name="Date" required>
-        <button type="submit">Add Order</button>
+        <input type="number" name="CustomerId" placeholder="Customer ID" required> <!-- Input field for customer ID -->
+        <input type="text" name="Description" placeholder="Description" required> <!-- Input field for description -->
+        <input type="number" name="Price" step="0.01" placeholder="Price" required> <!-- Input field for price, allows decimals -->
+        <input type="number" name="Amount" placeholder="Amount" required> <!-- Input field for quantity/amount -->
+        <input type="date" name="Date" required> <!-- Input field for date -->
+        <button type="submit">Add Order</button> <!-- Submit button to add the order -->
     </form>
-    <table border="1">
+
+    <!-- Table displaying all orders -->
+    <table border="1"> <!-- Table with a border to show order data -->
         <tr>
-            <th>ID</th><th>Customer ID</th><th>Description</th><th>Price</th><th>Amount</th><th>Date</th><th>Actions</th>
+            <th>ID</th><th>Customer ID</th><th>Description</th><th>Price</th><th>Amount</th><th>Date</th><th>Actions</th> <!-- Table headers -->
         </tr>
+
+        <!-- Loop through the orders and display each one in a new table row -->
         {% for order in orders %}
         <tr>
-            <td>{{ order.OrderId }}</td>
-            <td>{{ order.CustomerId }}</td>
-            <td>{{ order.Description }}</td>
-            <td>{{ order.Price }}</td>
-            <td>{{ order.Amount }}</td>
-            <td>{{ order.Date }}</td>
+            <td>{{ order.OrderId }}</td> <!-- Display Order ID -->
+            <td>{{ order.CustomerId }}</td> <!-- Display Customer ID -->
+            <td>{{ order.Description }}</td> <!-- Display Order Description -->
+            <td>{{ order.Price }}</td> <!-- Display Price -->
+            <td>{{ order.Amount }}</td> <!-- Display Amount -->
+            <td>{{ order.Date }}</td> <!-- Display Date of the order -->
             <td>
+                <!-- Form to edit the order, pre-filling the fields with existing data -->
                 <form action="/orders/edit/{{ order.OrderId }}" method="POST" style="display:inline;">
-                    <input type="number" name="CustomerId" value="{{ order.CustomerId }}" required>
-                    <input type="text" name="Description" value="{{ order.Description }}" required>
-                    <input type="number" name="Price" step="0.01" value="{{ order.Price }}" required>
-                    <input type="number" name="Amount" value="{{ order.Amount }}" required>
-                    <input type="date" name="Date" value="{{ order.Date }}" required>
-                    <button type="submit">Edit</button>
+                    <input type="number" name="CustomerId" value="{{ order.CustomerId }}" required> <!-- Editable Customer ID -->
+                    <input type="text" name="Description" value="{{ order.Description }}" required> <!-- Editable Description -->
+                    <input type="number" name="Price" step="0.01" value="{{ order.Price }}" required> <!-- Editable Price -->
+                    <input type="number" name="Amount" value="{{ order.Amount }}" required> <!-- Editable Amount -->
+                    <input type="date" name="Date" value="{{ order.Date }}" required> <!-- Editable Date -->
+                    <button type="submit">Edit</button> <!-- Submit button to edit the order -->
                 </form>
+
+                <!-- Form to delete the order -->
                 <form action="/orders/delete/{{ order.OrderId }}" method="POST" style="display:inline;">
-                    <button type="submit">Delete</button>
+                    <button type="submit">Delete</button> <!-- Submit button to delete the order -->
                 </form>
             </td>
         </tr>
         {% endfor %}
     </table>
-    <a href="/">Back to Home</a>
+
+    <!-- Link to navigate back to the homepage -->
+    <a href="/">Back to Home</a> <!-- Hyperlink to return to the homepage -->
 </body>
 </html>

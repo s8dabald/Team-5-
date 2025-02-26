@@ -2,122 +2,122 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width">
-    <title>Holzbau Dashboard</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <meta charset="UTF-8"> <!-- Character encoding for proper text display -->
+    <meta name="viewport" content="width=device-width"> <!-- Ensures proper scaling on mobile devices -->
+    <title>Holzbau Dashboard</title> <!-- Title of the page that appears in the browser tab -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Includes the Chart.js library for creating charts -->
     <style>
         /* General Styling */
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            margin: 0;
+            font-family: Arial, sans-serif; /* Sets the font style */
+            background-color: #f4f4f9; /* Light background color */
+            margin: 0; /* Removes default margin */
             /* padding: 20px; */
-            text-align: center;
+            text-align: center; /* Centers text on the page */
         }
 
         .navbar {
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: flex; /* Use flexbox to align items in a row */
+            align-items: center; /* Vertically center items */
+            justify-content: center; /* Horizontally center items */
             top: 0;
             left: 0;
-            width: 100%;
-            background-color: #007bff;
-            color: white;
-            padding: 15px;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-            z-index: 1000;
+            width: 100%; /* Full width for the navbar */
+            background-color: #007bff; /* Blue background for the navbar */
+            color: white; /* White text color */
+            padding: 15px; /* Padding around the navbar */
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Shadow for navbar */
+            z-index: 1000; /* Ensures the navbar stays on top */
         }
 
         .navbar h1 {
-            margin: 0;
-            font-size: 24px;
-            flex-grow: 1;
-            text-align: center;
+            margin: 0; /* Removes the default margin */
+            font-size: 24px; /* Sets the font size of the title */
+            flex-grow: 1; /* Makes the title flexible and fills available space */
+            text-align: center; /* Centers the title text */
         }
 
         .back-btn {
             position: absolute;
-            left: 20px;
-            background: white;
-            color: #007bff;
-            border: none;
-            padding: 8px 15px;
-            font-size: 16px;
-            font-weight: bold;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: 0.3s ease;
+            left: 20px; /* Places the button to the left */
+            background: white; /* White background for the button */
+            color: #007bff; /* Blue text color */
+            border: none; /* Removes border */
+            padding: 8px 15px; /* Padding around the button text */
+            font-size: 16px; /* Font size of the button text */
+            font-weight: bold; /* Makes the button text bold */
+            border-radius: 5px; /* Rounded corners */
+            cursor: pointer; /* Changes the cursor to a pointer on hover */
+            transition: 0.3s ease; /* Smooth transition for hover effect */
         }
 
         .back-btn:hover {
-            background: #f0f0f0;
+            background: #f0f0f0; /* Light background when the button is hovered */
         }
 
         h2 {
-            color: #333;
+            color: #333; /* Dark color for the headings */
         }
 
         /* Chart Containers */
         .charts-container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 30px;
-            margin-bottom: 30px;
+            display: flex; /* Flexbox layout for charts */
+            flex-wrap: wrap; /* Allows charts to wrap in the container */
+            justify-content: center; /* Centers charts */
+            gap: 30px; /* Adds space between charts */
+            margin-bottom: 30px; /* Adds margin below the charts container */
         }
 
         .chart-box {
-            background: white;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            width: 600px;
+            background: white; /* White background for each chart box */
+            padding: 15px; /* Padding inside the chart box */
+            border-radius: 8px; /* Rounded corners for the chart box */
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1); /* Shadow for the chart box */
+            text-align: center; /* Centers the chart inside the box */
+            width: 600px; /* Sets a fixed width for the chart box */
             /* Increased width */
-            height: 400px;
+            height: 400px; /* Sets a fixed height for the chart box */
             /* Increased height */
-            max-width: 100%;
+            max-width: 100%; /* Makes the width responsive */
         }
 
         /* Bar charts side by side */
         .bar-charts {
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-            flex-wrap: wrap;
+            display: flex; /* Flexbox layout to arrange bar charts side by side */
+            justify-content: center; /* Centers the bar charts */
+            gap: 30px; /* Adds space between bar charts */
+            flex-wrap: wrap; /* Allows bar charts to wrap if necessary */
         }
 
         /* Sales Trend Styling */
         .sales-trend {
-            width: 80%;
-            margin: 30px auto;
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+            width: 80%; /* Sets width of the sales trend section */
+            margin: 30px auto; /* Centers the sales trend section horizontally */
+            background: white; /* White background for sales trend */
+            padding: 20px; /* Padding inside the sales trend box */
+            border-radius: 8px; /* Rounded corners */
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1); /* Shadow for sales trend box */
         }
 
         /* Pie Chart Styling */
         .pie-chart {
-            max-width: 400px;
-            margin: auto;
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+            max-width: 400px; /* Limits the maximum width of the pie chart */
+            margin: auto; /* Centers the pie chart */
+            background: white; /* White background for pie chart */
+            padding: 20px; /* Padding inside the pie chart box */
+            border-radius: 8px; /* Rounded corners */
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1); /* Shadow for pie chart box */
         }
 
         /* Responsive Design */
         @media (max-width: 768px) {
             .bar-charts {
-                flex-direction: column;
-                align-items: center;
+                flex-direction: column; /* Stacks bar charts vertically on smaller screens */
+                align-items: center; /* Centers the bar charts */
             }
 
             .sales-trend {
-                width: 95%;
+                width: 95%; /* Adjusts the width of the sales trend section on smaller screens */
             }
         }
     </style>
@@ -125,58 +125,59 @@
 
 <body>
     <div class="navbar">
-        <button class="back-btn" onclick="history.back()">&#8592; Back</button>
-        <h1>Dashboard</h1>
+        <button class="back-btn" onclick="history.back()">&#8592; Back</button> <!-- Back button to navigate to the previous page -->
+        <h1>Dashboard</h1> <!-- Main title of the page -->
     </div>
 
     <div class="bar-charts">
+        <!-- Container for bar charts -->
         <div>
-            <h2>Customer Distribution by Country</h2>
+            <h2>Customer Distribution by Country</h2> <!-- Title for the country distribution chart -->
             <div class="chart-box">
-                <canvas id="countryChart"></canvas>
+                <canvas id="countryChart"></canvas> <!-- Canvas element where the country chart will be rendered -->
             </div>
         </div>
         <div>
-            <h2>Popular Products</h2>
+            <h2>Popular Products</h2> <!-- Title for the popular products chart -->
             <div class="chart-box">
-                <canvas id="productChart"></canvas>
+                <canvas id="productChart"></canvas> <!-- Canvas element where the product chart will be rendered -->
             </div>
         </div>
     </div>
 
-    <h2>Customer Segments</h2>
+    <h2>Customer Segments</h2> <!-- Title for the customer segments chart -->
     <div class="pie-chart">
-        <canvas id="customerSegments"></canvas>
+        <canvas id="customerSegments"></canvas> <!-- Canvas element where the pie chart will be rendered -->
     </div>
 
-    <h2>Sales Trend</h2>
+    <h2>Sales Trend</h2> <!-- Title for the sales trend chart -->
     <div class="sales-trend">
-        <canvas id="salesTrendChart"></canvas>
+        <canvas id="salesTrendChart"></canvas> <!-- Canvas element where the sales trend chart will be rendered -->
     </div>
 
     <script>
         // Pass the country distribution from Flask to JavaScript
-        var countryData = {{ country_distribution | tojson }};
-        var productData = {{ popular_products | tojson }};
+        var countryData = {{ country_distribution | tojson }}; <!-- Flask variable for country distribution -->
+        var productData = {{ popular_products | tojson }}; <!-- Flask variable for popular products -->
 
         // Extract labels (countries) and values (counts)
-        var countryLabels = Object.keys(countryData);
-        var countryValues = Object.values(countryData);
-        var productLabels = Object.keys(productData);
-        var productData = Object.values(productData)
+        var countryLabels = Object.keys(countryData);  <!-- Extracts country names -->
+        var countryValues = Object.values(countryData); <!-- Extracts number of customers per country -->
+        var productLabels = Object.keys(productData);  <!-- Extracts product names -->
+        var productData = Object.values(productData)   <!-- Extracts number of times each product was purchased -->
 
-        // Create Chart.js bar chart
+        // Create Chart.js bar chart for country distribution
         var ctx = document.getElementById('countryChart').getContext('2d');
         var ptx = document.getElementById('productChart').getContext('2d');
         new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: countryLabels,
+                labels: countryLabels, <!-- Sets the labels for the x-axis -->
                 datasets: [{
                     label: 'Number of Customers',
-                    data: countryValues,
-                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
-                    borderColor: 'rgba(54, 162, 235, 1)',
+                    data: countryValues, <!-- Sets the data for the y-axis -->
+                    backgroundColor: 'rgba(54, 162, 235, 0.5)', <!-- Sets the color for the bars -->
+                    borderColor: 'rgba(54, 162, 235, 1)', <!-- Sets the border color of the bars -->
                     borderWidth: 1
                 }]
             },
@@ -184,20 +185,22 @@
                 responsive: true,
                 scales: {
                     y: {
-                        beginAtZero: true
+                        beginAtZero: true <!-- Ensures the y-axis starts from zero -->
                     }
                 }
             }
         });
+
+        // Create Chart.js bar chart for popular products
         new Chart(ptx, {
             type: 'bar',
             data: {
-                labels: productLabels,
+                labels: productLabels, <!-- Sets the labels for the x-axis -->
                 datasets: [{
                     label: 'Popular Products',
-                    data: productData,
-                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
-                    borderColor: 'rgba(54, 162, 235, 1)',
+                    data: productData, <!-- Sets the data for the y-axis -->
+                    backgroundColor: 'rgba(54, 162, 235, 0.5)', <!-- Sets the color for the bars -->
+                    borderColor: 'rgba(54, 162, 235, 1)', <!-- Sets the border color of the bars -->
                     borderWidth: 1
                 }]
             },
@@ -205,30 +208,31 @@
                 responsive: true,
                 scales: {
                     y: {
-                        beginAtZero: true
+                        beginAtZero: true <!-- Ensures the y-axis starts from zero -->
                     }
                 }
             }
         });
-        var segmentData = {{ segments | tojson }};
+
+        var segmentData = {{ segments | tojson }}; <!-- Flask variable for customer segments -->
 
         // Extract segment labels and counts
-        var segmentLabels = Object.keys(segmentData);
-        var segmentCounts = Object.values(segmentData);
+        var segmentLabels = Object.keys(segmentData); <!-- Extracts segment labels -->
+        var segmentCounts = Object.values(segmentData); <!-- Extracts segment counts -->
 
         // Define colors for the segments
         var segmentColors = ['rgba(255, 99, 132, 0.7)', 'rgba(54, 162, 235, 0.7)', 'rgba(75, 192, 192, 0.7)'];
 
-        // Create Chart.js pie chart
+        // Create Chart.js pie chart for customer segments
         var stx = document.getElementById('customerSegments').getContext('2d');
         new Chart(stx, {
             type: 'pie',
             data: {
-                labels: segmentLabels.map(label => 'Segment ' + label),
+                labels: segmentLabels.map(label => 'Segment ' + label), <!-- Sets segment labels -->
                 datasets: [{
-                    data: segmentCounts,
-                    backgroundColor: segmentColors,
-                    borderColor: 'rgba(255, 255, 255, 1)',
+                    data: segmentCounts, <!-- Sets the data for the segments -->
+                    backgroundColor: segmentColors, <!-- Sets the colors for the segments -->
+                    borderColor: 'rgba(255, 255, 255, 1)', <!-- Sets the border color of the segments -->
                     borderWidth: 1
                 }]
             },
@@ -236,44 +240,43 @@
                 responsive: true,
                 plugins: {
                     legend: {
-                        position: 'top'
+                        position: 'top' <!-- Positions the legend at the top -->
                     }
                 }
             }
         });
 
-
-        var salesTrendData = {{ sales_trend | tojson }};
+        var salesTrendData = {{ sales_trend | tojson }}; <!-- Flask variable for sales trend -->
 
         // Extract dates and sales values
-        var labels = Object.keys(salesTrendData);  // Months
-        var salesValues = Object.values(salesTrendData);  // Sales count
+        var labels = Object.keys(salesTrendData);  <!-- Extracts months -->
+        var salesValues = Object.values(salesTrendData);  <!-- Extracts sales values -->
 
-        // Create the line chart using Chart.js
+        // Create the line chart for sales trend
         var ctx = document.getElementById('salesTrendChart').getContext('2d');
         new Chart(ctx, {
             type: 'line',
             data: {
-                labels: labels,
+                labels: labels, <!-- Sets the labels for the x-axis (months) -->
                 datasets: [{
                     label: 'Sales per Month',
-                    data: salesValues,
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    borderWidth: 2,
-                    pointRadius: 3,
-                    pointBackgroundColor: 'rgba(75, 192, 192, 1)',
-                    tension: 0.3
+                    data: salesValues, <!-- Sets the data for the y-axis (sales count) -->
+                    borderColor: 'rgba(75, 192, 192, 1)', <!-- Sets the line color -->
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)', <!-- Sets the fill color below the line -->
+                    borderWidth: 2, <!-- Sets the border width of the line -->
+                    pointRadius: 3, <!-- Sets the radius of points on the line -->
+                    pointBackgroundColor: 'rgba(75, 192, 192, 1)', <!-- Sets the color for the points -->
+                    tension: 0.3 <!-- Makes the line smooth -->
                 }]
             },
             options: {
                 responsive: true,
                 plugins: {
-                    legend: { position: 'top' }
+                    legend: { position: 'top' } <!-- Positions the legend at the top -->
                 },
                 scales: {
-                    x: { title: { display: true, text: 'Month' } },
-                    y: { title: { display: true, text: 'Sales Count' } }
+                    x: { title: { display: true, text: 'Month' } }, <!-- Labels the x-axis as 'Month' -->
+                    y: { title: { display: true, text: 'Sales Count' } } <!-- Labels the y-axis as 'Sales Count' -->
                 }
             }
         });

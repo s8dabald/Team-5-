@@ -1,91 +1,99 @@
 <div class="navbar">
-    <button class="back-btn" onclick="history.back()">&#8592; Back</button>
-    <h1>Holiday Offers</h1>
+    <button class="back-btn" onclick="history.back()">&#8592; Back</button> <!-- Back button to return to the previous page -->
+    <h1>Holiday Offers</h1> <!-- Main title for the page -->
 </div>
 
 <div class="offer-settings">
+    <!-- Christmas Offer Section -->
     <div class="offer-row">
-        <h2>Christmas</h2>
+        <h2>Christmas</h2> <!-- Title for Christmas offer settings -->
         <div class="offer-controls">
             <label class="checkbox-col" for="christmas-active">
                 <input type="checkbox" id="christmas-active" name="christmas-active" {% if offers.get('christmas', {}).get('active') %}checked{% endif %}> Activate Offer
             </label>
+            <!-- Checkbox to activate or deactivate the Christmas offer -->
             <div class="percentage-group">
                 <label class="percentage-col" for="christmas-percentage">Percentage:</label>
-                <input class="percentage-input" type="number" id="christmas-percentage" name="christmas-percentage" min="0" max="100" value="{{ offers.get('christmas', {}).get('percentage', 0) }}"> %
+                <input class="percentage-input" type="number" id="christmas-percentage" name="christmas-percentage" min="0" max="100" value="{{ offers.get('christmas', {}).get('percentage', 0) }}"> % <!-- Input for the percentage of the Christmas offer -->
             </div>
         </div>
     </div>
+
+    <!-- Black Friday Offer Section -->
     <div class="offer-row">
-        <h2>Black Friday</h2>
+        <h2>Black Friday</h2> <!-- Title for Black Friday offer settings -->
         <div class="offer-controls">
             <label class="checkbox-col" for="blackfriday-active">
                 <input type="checkbox" id="blackfriday-active" name="blackfriday-active" {% if offers.get('blackfriday', {}).get('active') %}checked{% endif %}> Activate Offer
             </label>
+            <!-- Checkbox to activate or deactivate the Black Friday offer -->
             <div class="percentage-group">
                 <label class="percentage-col" for="blackfriday-percentage">Percentage:</label>
-                <input class="percentage-input" type="number" id="blackfriday-percentage" name="blackfriday-percentage" min="0" max="100" value="{{ offers.get('blackfriday', {}).get('percentage', 0) }}"> %
+                <input class="percentage-input" type="number" id="blackfriday-percentage" name="blackfriday-percentage" min="0" max="100" value="{{ offers.get('blackfriday', {}).get('percentage', 0) }}"> % <!-- Input for the percentage of the Black Friday offer -->
             </div>
         </div>
     </div>
+
+    <!-- Easter Offer Section -->
     <div class="offer-row">
-        <h2>Easter</h2>
+        <h2>Easter</h2> <!-- Title for Easter offer settings -->
         <div class="offer-controls">
             <label class="checkbox-col" for="easter-active">
                 <input type="checkbox" id="easter-active" name="easter-active" {% if offers.get('easter', {}).get('active') %}checked{% endif %}> Activate Offer
             </label>
+            <!-- Checkbox to activate or deactivate the Easter offer -->
             <div class="percentage-group">
                 <label class="percentage-col" for="easter-percentage">Percentage:</label>
-                <input class="percentage-input" type="number" id="easter-percentage" name="easter-percentage" min="0" max="100" value="{{ offers.get('easter', {}).get('percentage', 0) }}"> %
+                <input class="percentage-input" type="number" id="easter-percentage" name="easter-percentage" min="0" max="100" value="{{ offers.get('easter', {}).get('percentage', 0) }}"> % <!-- Input for the percentage of the Easter offer -->
             </div>
         </div>
     </div>
 </div>
 
-<button onclick="saveOffers()">Save Changes</button>
+<button onclick="saveOffers()">Save Changes</button> <!-- Button to save the changes -->
 
 <script>
     function saveOffers() {
         const offers = {
             christmas: {
-                active: document.getElementById('christmas-active').checked,
-                percentage: document.getElementById('christmas-percentage').value
+                active: document.getElementById('christmas-active').checked, <!-- Get the status of the Christmas offer -->
+                percentage: document.getElementById('christmas-percentage').value <!-- Get the percentage for the Christmas offer -->
             },
             blackfriday: {
-                active: document.getElementById('blackfriday-active').checked,
-                percentage: document.getElementById('blackfriday-percentage').value
+                active: document.getElementById('blackfriday-active').checked, <!-- Get the status of the Black Friday offer -->
+                percentage: document.getElementById('blackfriday-percentage').value <!-- Get the percentage for the Black Friday offer -->
             },
             easter: {
-                active: document.getElementById('easter-active').checked,
-                percentage: document.getElementById('easter-percentage').value
+                active: document.getElementById('easter-active').checked, <!-- Get the status of the Easter offer -->
+                percentage: document.getElementById('easter-percentage').value <!-- Get the percentage for the Easter offer -->
             }
         };
 
         // Validate before sending
         if (
-            (offers.christmas.active && (offers.christmas.percentage < 0 || offers.christmas.percentage > 100)) ||
-            (offers.blackfriday.active && (offers.blackfriday.percentage < 0 || offers.blackfriday.percentage > 100)) ||
-            (offers.easter.active && (offers.easter.percentage < 0 || offers.easter.percentage > 100))
+            (offers.christmas.active && (offers.christmas.percentage < 0 || offers.christmas.percentage > 100)) || <!-- Validate Christmas percentage -->
+            (offers.blackfriday.active && (offers.blackfriday.percentage < 0 || offers.blackfriday.percentage > 100)) || <!-- Validate Black Friday percentage -->
+            (offers.easter.active && (offers.easter.percentage < 0 || offers.easter.percentage > 100)) <!-- Validate Easter percentage -->
         ) {
-            alert("Percentage values must be between 0 and 100.");
+            alert("Percentage values must be between 0 and 100."); <!-- Alert if any percentage is invalid -->
             return; // Stop execution if validation fails
         }
 
-        fetch('/save_offers', {
+        fetch('/save_offers', { <!-- Send data to the server -->
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json' <!-- Set content type as JSON -->
             },
-            body: JSON.stringify(offers)
+            body: JSON.stringify(offers) <!-- Send the offer data as a JSON string -->
         })
-        .then(response => response.json())
+        .then(response => response.json()) <!-- Handle the response as JSON -->
         .then(data => {
-            console.log('Offers saved:', data);
-            alert("Offers saved successfully!");
+            console.log('Offers saved:', data); <!-- Log the response data -->
+            alert("Offers saved successfully!"); <!-- Alert that the offers were saved -->
         })
         .catch(error => {
-            console.error('Error saving offers:', error);
-            alert("Error saving offers. Please try again.");
+            console.error('Error saving offers:', error); <!-- Log any errors -->
+            alert("Error saving offers. Please try again."); <!-- Alert if an error occurs -->
         });
     }
 </script>
@@ -93,37 +101,37 @@
 <style>
     .offer-row {
         display: flex;
-        align-items: baseline; /* Align to baseline */
-        margin-bottom: 10px;
+        align-items: baseline; /* Align elements to baseline (for consistent text height) */
+        margin-bottom: 10px; /* Add space between offer rows */
     }
 
     .offer-row h2 {
-        margin-right: 20px;
-        width: 100px;
+        margin-right: 20px; /* Space between the heading and the controls */
+        width: 100px; /* Set a fixed width for the heading */
     }
 
     .offer-controls {
         display: flex;
-        align-items: baseline; /* Align to baseline */
-        width: 300px;
+        align-items: baseline; /* Align elements to baseline (for consistent text height) */
+        width: 300px; /* Set width for the offer controls */
     }
 
     .checkbox-col {
-        width: 120px;
+        width: 120px; /* Set width for the checkbox label */
     }
 
     .percentage-group {
         display: flex;
-        align-items: baseline; /* Align to baseline */
-        width: 180px;
+        align-items: baseline; /* Align elements to baseline (for consistent text height) */
+        width: 180px; /* Set width for the percentage group */
     }
 
     .percentage-col {
-        width: 90px;
-        margin-right: 10px;
+        width: 90px; /* Set width for the percentage label */
+        margin-right: 10px; /* Space between the label and input */
     }
 
     .percentage-input {
-        width: 60px;
+        width: 60px; /* Set width for the percentage input field */
     }
 </style>

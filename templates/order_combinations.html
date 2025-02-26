@@ -5,56 +5,62 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Order Combinations</title>
     <style>
+        /* General styles for the body */
         body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
+            font-family: Arial, sans-serif; /* Set font family to Arial */
+            padding: 20px; /* Add padding around the body */
         }
 
+        /* Style for the main header (h2) */
         h2 {
-            text-align: center;
-            margin-bottom: 20px;
+            text-align: center; /* Center align the header */
+            margin-bottom: 20px; /* Add bottom margin for spacing */
         }
 
+        /* Style for the unordered list of combinations */
         .combinations-list {
-            list-style-type: none;
-            padding: 0;
+            list-style-type: none; /* Remove bullet points */
+            padding: 0; /* Remove padding */
         }
 
+        /* Style for each list item representing a combination */
         .combinations-list li {
-            background-color: #f9f9f9;
-            border: 1px solid #ddd;
-            margin: 5px 0;
-            padding: 10px;
-            border-radius: 5px;
+            background-color: #f9f9f9; /* Set background color */
+            border: 1px solid #ddd; /* Set a light gray border */
+            margin: 5px 0; /* Add vertical margin between list items */
+            padding: 10px; /* Add padding inside list items */
+            border-radius: 5px; /* Rounded corners */
         }
 
+        /* Style for the combination item text */
         .combination-item {
-            font-weight: bold;
+            font-weight: bold; /* Make the combination text bold */
         }
 
+        /* Style for the combination count (number of times) */
         .combination-count {
-            font-style: italic;
-            color: gray;
+            font-style: italic; /* Italicize the count text */
+            color: gray; /* Set the count text color to gray */
         }
     </style>
 </head>
 <body>
 
-<h2>Order Combinations</h2>
+<h2>Order Combinations</h2> <!-- Main title for the page -->
 
 <div class="combinations-container">
-    {% if top_combinations %}
-        <h3>Most Common Combinations:</h3>
+    {% if top_combinations %} <!-- Check if there are any combinations to display -->
+        <h3>Most Common Combinations:</h3> <!-- Subtitle for the list of combinations -->
         <ul class="combinations-list">
-            {% for combination, count in top_combinations %}
+            {% for combination, count in top_combinations %} <!-- Loop through each combination and its count -->
                 <li>
-                    <span class="combination-item">{{ combination }}</span>
-                    <span class="combination-count">({{ count }} times)</span>
+                    <span class="combination-item">{{ combination }}</span> <!-- Display the combination item -->
+                    <span class="combination-count">({{ count }} times)</span> <!-- Display how many times the combination was ordered -->
                 </li>
             {% endfor %}
         </ul>
-    {% else %}
-        <p>No combinations found.</p>
+    {% else %} <!-- If no combinations are found -->
+        <p>No combinations found.</p> <!-- Display a message indicating no combinations -->
     {% endif %}
 </div>
 

@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Order Combinations</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <title>Order Combinations</title> <!-- Title of the page displayed in the browser tab -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- External library for creating charts -->
   <style>
+    /* Basic styling for tables, th, td */
     table, th, td {
       border: 1px solid black;
       border-collapse: collapse;
@@ -14,6 +15,7 @@
       padding: 10px;
       text-align: left;
     }
+    /* Styling for input fields, buttons, and select elements */
     input, button, select {
       margin: 10px;
       padding: 8px;
@@ -21,12 +23,14 @@
   </style>
 </head>
 <body>
-  <!-- bar chart -->
+  <!-- Heading for the bar chart section -->
   <h3>The 10 most common order combinations:</h3>
+
+  <!-- Canvas for rendering the bar chart -->
   <canvas id="staticChart" width="640" height="320"></canvas>
 
   <script>
-    // prepare data for bar chart
+    // Prepare data for the bar chart from the server-side template variables
     const staticLabels = [
       {% for combo, count in static_combinations %}
         "{{ combo }}",
@@ -38,26 +42,26 @@
       {% endfor %}
     ];
 
-    // initialize the bar chart
+    // Initialize and render the bar chart using Chart.js
     const ctx = document.getElementById('staticChart').getContext('2d');
     const staticChart = new Chart(ctx, {
-      type: 'bar',
+      type: 'bar', // Chart type is bar
       data: {
-        labels: staticLabels,
+        labels: staticLabels, // Labels for each bar (combinations)
         datasets: [{
-          label: 'Anzahl der Kombinationen',
-          data: staticData,
-          backgroundColor: 'rgba(54, 162, 235, 0.5)',
-          borderColor: 'rgba(54, 162, 235, 1)',
-          borderWidth: 1
+          label: 'Anzahl der Kombinationen', // Label for the chart dataset
+          data: staticData, // Data for the chart (number of occurrences)
+          backgroundColor: 'rgba(54, 162, 235, 0.5)', // Bar color
+          borderColor: 'rgba(54, 162, 235, 1)', // Border color for bars
+          borderWidth: 1 // Border width for the bars
         }]
       },
       options: {
         scales: {
           y: {
-            beginAtZero: true,
+            beginAtZero: true, // Y-axis starts at zero
             ticks: {
-              stepSize: 1
+              stepSize: 1 // Y-axis tick step size
             }
           }
         }
@@ -65,20 +69,20 @@
     });
   </script>
 
-  <!-- Dropdown for item selection -->
+  <!-- Dropdown for selecting an item to view its most common combinations -->
   <h3>Select an item to view its most common combinations:</h3>
   <form action="{{ url_for('search_order_combinations') }}" method="post">
       <label for="item">Choose an item:</label>
       <select name="item" id="item" required>
-        <option value="" disabled {% if not search_item %}selected{% endif %}>choose item</option>
+        <option value="" disabled {% if not search_item %}selected{% endif %}>choose item</option> <!-- Default option when no item is selected -->
         {% for product in product_list %}
-          <option value="{{ product }}" {% if search_item == product.lower() %}selected{% endif %}>{{ product }}</option>
+          <option value="{{ product }}" {% if search_item == product.lower() %}selected{% endif %}>{{ product }}</option> <!-- Dynamically fill options with product list -->
         {% endfor %}
       </select>
-      <button type="submit">Search</button>
+      <button type="submit">Search</button> <!-- Submit button for the form -->
   </form>
 
-  <!-- Search results as table -->
+  <!-- Display the search results in a table, shown only if an item is selected -->
   {% if search_item %}
   <h3>Most common order combinations for: {{ search_item }}</h3>
   <table>
@@ -92,96 +96,89 @@
       <tbody>
           {% for combo, count in search_top_combinations %}
           <tr>
-              <td>{{ combo }}</td>
-              <td>{{ count }}</td>
-              <td>{{ (count / total_combinations * 100)|round(2) }}%</td>
+              <td>{{ combo }}</td> <!-- Combination name -->
+              <td>{{ count }}</td> <!-- Count of the combination -->
+              <td>{{ (count / total_combinations * 100)|round(2) }}%</td> <!-- Percentage calculation for the combination -->
           </tr>
           {% endfor %}
       </tbody>
   </table>
 
- <!-- Shows the total amount of orders for the item -->
-<p><strong>Total Orders including {{ search_item }}: {{ total_combinations }}</strong></p>
+  <!-- Display the total number of orders for the selected item -->
+  <p><strong>Total Orders including {{ search_item }}: {{ total_combinations }}</strong></p>
 
+  <!-- Heading for the polar area chart -->
+  <h3>Polar Area Chart for: {{ search_item }}</h3>
 
-<!-- Polar Area Chart for search results -->
-<h3>Polar Area Chart for: {{ search_item }}</h3>
-<canvas id="polarChart" width="640" height="320"></canvas>
-<script>
+  <!-- Canvas for rendering the polar area chart -->
+  <canvas id="polarChart" width="640" height="320"></canvas>
+  <script>
+    // Generate labels and data from the search results for the polar chart
+    const polarLabels = [
+      {% for combo, count in search_top_combinations %}
+        "{{ combo }}",
+      {% endfor %}
+    ];
+    const polarData = [
+      {% for combo, count in search_top_combinations %}
+        {{ count }},
+      {% endfor %}
+    ];
 
-  // generate labels and data from search results
-  const polarLabels = [
-    {% for combo, count in search_top_combinations %}
-      "{{ combo }}",
-    {% endfor %}
-  ];
-  const polarData = [
-    {% for combo, count in search_top_combinations %}
-      {{ count }},
-    {% endfor %}
-  ];
+    // Define colors for the segments in the polar area chart
+    const blueBackgroundColors = [
+      '#0d47a1', '#1565c0', '#1976d2', '#1e88e5', '#2196f3', '#42a5f5', '#64b5f6', '#90caf9', '#bbdefb', '#e3f2fd'
+    ];
 
-  const blueBackgroundColors = [
-    '#0d47a1', // sehr dunkel
-    '#1565c0',
-    '#1976d2',
-    '#1e88e5',
-    '#2196f3',
-    '#42a5f5',
-    '#64b5f6',
-    '#90caf9',
-    '#bbdefb',
-    '#e3f2fd'
-  ];
+    // Slice the color array to match the number of data points
+    const datasetColors = blueBackgroundColors.slice(0, polarData.length);
 
-  // Use as many colors as datapoints (for the case datapoints is <10
-  const datasetColors = blueBackgroundColors.slice(0, polarData.length);
+    // Plugin to make the r-scale visible always on the foreground of the polar chart
+    const foregroundScalePlugin = {
+      id: 'foregroundScalePlugin',
+      afterDatasetsDraw(chart, args, options) {
+        chart.scales.r.draw(); // Draw the scale at the front after rendering the datasets
+      }
+    };
 
-  // Plugin, that draws the r-Skala retrospectively so its in the foreground and always readable
-  const foregroundScalePlugin = {
-    id: 'foregroundScalePlugin',
-    afterDatasetsDraw(chart, args, options) {
-      chart.scales.r.draw();
-    }
-  };
-
-  const ctxPolar = document.getElementById('polarChart').getContext('2d');
-  new Chart(ctxPolar, {
-    type: 'polarArea',
-    data: {
-      labels: polarLabels,
-      datasets: [{
-        label: 'Counts',
-        data: polarData,
-        backgroundColor: datasetColors,
-        borderColor: datasetColors,
-        borderWidth: 1
-      }]
-    },
-    options: {
-      responsive: true,
-      scales: {
-        r: {
-          ticks: {
-            display: true,
-            color: 'black',
-            backdropColor: 'rgba(255, 255, 255, 0.8)',
-            padding: 5
-          },
-          grid: {
-            color: 'rgba(0, 0, 0, 0.2)'
-          },
-          title: {
-            display: true,
-            text: 'Count',
-            color: 'black'
+    // Initialize and render the polar area chart
+    const ctxPolar = document.getElementById('polarChart').getContext('2d');
+    new Chart(ctxPolar, {
+      type: 'polarArea', // Polar area chart type
+      data: {
+        labels: polarLabels, // Labels for each segment
+        datasets: [{
+          label: 'Counts',
+          data: polarData, // Data for the segments
+          backgroundColor: datasetColors, // Segment colors
+          borderColor: datasetColors, // Border colors for each segment
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true, // Responsive chart resizing
+        scales: {
+          r: {
+            ticks: {
+              display: true, // Show ticks for the r-scale
+              color: 'black',
+              backdropColor: 'rgba(255, 255, 255, 0.8)',
+              padding: 5
+            },
+            grid: {
+              color: 'rgba(0, 0, 0, 0.2)' // Grid line color
+            },
+            title: {
+              display: true,
+              text: 'Count',
+              color: 'black' // Title for the r-scale
+            }
           }
         }
-      }
-    },
-    plugins: [foregroundScalePlugin]
-  });
-</script>
-{% endif %}
+      },
+      plugins: [foregroundScalePlugin] // Add the foreground scale plugin
+    });
+  </script>
+  {% endif %}
 </body>
 </html>

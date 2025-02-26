@@ -3,18 +3,21 @@
 <head>
     <title>Holzbau Database</title>
     <style>
+        /* Body Styling */
         body {
             display: flex; /* Use flexbox for layout */
             height: 100vh; /* Make body full viewport height */
             margin: 0; /* Remove default margins */
         }
 
+        /* Styling for the navigation bar */
         nav {
             width: 200px; /* Set width for the navigation bar */
             background-color: #f0f0f0; /* Example background color */
             padding: 20px;
         }
 
+        /* Styling for each link in the navigation bar */
         nav a {
             display: block; /* Make links stack vertically */
             margin-bottom: 10px;
@@ -23,31 +26,35 @@
             color: #333; /* Example text color */
         }
 
-        /* CSS für den aktiven Navigationslink */
+        /* CSS for the active navigation link */
         nav a.active {
-            box-shadow: inset 5px 0 0 0 #000;  /* Innerer Schatten links */
-            background-color: #e3f2fd;          /* Heller Hintergrund */
-            font-weight: bold;
+            box-shadow: inset 5px 0 0 0 #000;  /* Inner shadow on the left */
+            background-color: #e3f2fd;          /* Light background color */
+            font-weight: bold; /* Bold text for the active link */
         }
 
+        /* Content area styling */
         #content {
             flex: 1; /* Make content area take up remaining space */
             padding: 20px;
-            border-left: 1px solid #ccc; /* Add a separator line */
-            overflow-y: auto; /* Add scroll if content overflows */
+            border-left: 1px solid #ccc; /* Add a separator line between nav and content */
+            overflow-y: auto; /* Add a scroll if content overflows */
         }
 
+        /* Styling for the iframe */
         iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
+            width: 100%; /* Make the iframe take up full width of the content area */
+            height: 100%; /* Make the iframe take up full height of the content area */
+            border: none; /* Remove default iframe border */
         }
     </style>
 </head>
 <body>
 
+    <!-- Navigation Sidebar -->
     <nav>
-        <h1>Holzbau</h1>
+        <h1>Holzbau</h1> <!-- Title in the navigation bar -->
+        <!-- Navigation links with conditional active class based on current page -->
         <a href="/dashboard" target="contentFrame" class="{% if request.path == '/dashboard' %}active{% endif %}">Dashboard</a>
         <a href="/customers" target="contentFrame" class="{% if request.path == '/customers' %}active{% endif %}">Customers</a>
         <a href="/orders" target="contentFrame" class="{% if request.path == '/orders' %}active{% endif %}">Orders</a>
@@ -57,22 +64,26 @@
         <a href="/employee_analysis" target="contentFrame" class="{% if request.path == '/employee_analysis' %}active{% endif %}">Employee Analytics</a>
     </nav>
 
+    <!-- Content Area where the iframe will load content -->
     <div id="content">
-        <iframe name="contentFrame" src="/dashboard"></iframe>
+        <iframe name="contentFrame" src="/dashboard"></iframe> <!-- Default page loaded into iframe -->
     </div>
 
     <script>
-        // Füge einen Listener hinzu, der beim Laden des iFrames den aktuellen Pfad ermittelt
+        // Add an event listener that triggers when the iframe content loads
         document.querySelector('iframe[name="contentFrame"]').addEventListener('load', function() {
-    let iframePath = this.contentWindow.location.pathname;
-    document.querySelectorAll('nav a').forEach(link => {
-        link.classList.remove('active');
-        // Verwende startsWith, um zu prüfen, ob der iframePath mit dem href-Wert beginnt
-        if(iframePath.startsWith(link.getAttribute('href'))) {
-            link.classList.add('active');
-        }
-    });
-});
+            // Get the current path of the iframe content
+            let iframePath = this.contentWindow.location.pathname;
+
+            // Loop through all navigation links and update the active class based on the iframe path
+            document.querySelectorAll('nav a').forEach(link => {
+                link.classList.remove('active'); // Remove active class from all links
+                // Check if the iframe path starts with the href value of the link
+                if(iframePath.startsWith(link.getAttribute('href'))) {
+                    link.classList.add('active'); // Add active class to the matching link
+                }
+            });
+        });
     </script>
 </body>
 </html>
