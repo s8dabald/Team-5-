@@ -3,182 +3,307 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Order Combinations</title> <!-- Title of the page displayed in the browser tab -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- External library for creating charts -->
+  <title>Recommendation Engine</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    /* Basic styling for tables, th, td */
+    /* Basic styling for sections */
+    .section {
+      border: 1px solid #ccc;
+      padding: 20px;
+      margin: 20px 0;
+      border-radius: 4px;
+      background-color: #f9f9f9;
+    }
+    .section h3 {
+      margin-top: 0;
+      color: #333;
+    }
+    /* Table styling */
     table, th, td {
-      border: 1px solid black;
+      border: 1px solid #333;
       border-collapse: collapse;
     }
     th, td {
       padding: 10px;
       text-align: left;
     }
-    /* Styling for input fields, buttons, and select elements */
+    /* Input, button, and select styling */
     input, button, select {
-      margin: 10px;
+      margin: 10px 0;
       padding: 8px;
     }
   </style>
 </head>
 <body>
-  <!-- Heading for the bar chart section -->
-  <h3>The 10 most common order combinations:</h3>
 
-  <!-- Canvas for rendering the bar chart -->
-  <canvas id="staticChart" width="640" height="320"></canvas>
-
-  <script>
-    // Prepare data for the bar chart from the server-side template variables
-    const staticLabels = [
-      {% for combo, count in static_combinations %}
-        "{{ combo }}",
-      {% endfor %}
-    ];
-    const staticData = [
-      {% for combo, count in static_combinations %}
-        {{ count }},
-      {% endfor %}
-    ];
-
-    // Initialize and render the bar chart using Chart.js
-    const ctx = document.getElementById('staticChart').getContext('2d');
-    const staticChart = new Chart(ctx, {
-      type: 'bar', // Chart type is bar
-      data: {
-        labels: staticLabels, // Labels for each bar (combinations)
-        datasets: [{
-          label: 'Anzahl der Kombinationen', // Label for the chart dataset
-          data: staticData, // Data for the chart (number of occurrences)
-          backgroundColor: 'rgba(54, 162, 235, 0.5)', // Bar color
-          borderColor: 'rgba(54, 162, 235, 1)', // Border color for bars
-          borderWidth: 1 // Border width for the bars
-        }]
-      },
-      options: {
-        scales: {
-          y: {
-            beginAtZero: true, // Y-axis starts at zero
-            ticks: {
-              stepSize: 1 // Y-axis tick step size
+  <!-- Section 1: Static Bar Chart -->
+  <div class="section" id="section1">
+    <h3>Most common combinations of items per customer</h3>
+    <!-- Canvas for the static bar chart -->
+    <canvas id="staticChart" width="640" height="320"></canvas>
+    <script>
+      // Prepare data for the static bar chart from static_combinations
+      const staticLabels = [
+        {% for combo, count in static_combinations %}
+          "{{ combo }}",
+        {% endfor %}
+      ];
+      const staticData = [
+        {% for combo, count in static_combinations %}
+          {{ count }},
+        {% endfor %}
+      ];
+      // Initialize the bar chart
+      const ctxStatic = document.getElementById('staticChart').getContext('2d');
+      new Chart(ctxStatic, {
+        type: 'bar',
+        data: {
+          labels: staticLabels,
+          datasets: [{
+            label: 'Number of Combinations',
+            data: staticData,
+            backgroundColor: 'rgba(54, 162, 235, 0.5)',
+            borderColor: 'rgba(54, 162, 235, 1)',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: { stepSize: 1 }
             }
           }
         }
-      }
-    });
-  </script>
+      });
+    </script>
+  </div>
 
-  <!-- Dropdown for selecting an item to view its most common combinations -->
-  <h3>Select an item to view its most common combinations:</h3>
-  <form action="{{ url_for('search_order_combinations') }}" method="post">
+  <!-- Section 2: Single Item Search -->
+  <div class="section" id="section2">
+    <h3>Most likely combinations for single Items</h3>
+    <!-- Form for selecting a single item -->
+    <form action="{{ url_for('search_order_combinations') }}" method="post">
       <label for="item">Choose an item:</label>
       <select name="item" id="item" required>
-        <option value="" disabled {% if not search_item %}selected{% endif %}>choose item</option> <!-- Default option when no item is selected -->
+        <option value="" disabled {% if not search_item %}selected{% endif %}>choose item</option>
         {% for product in product_list %}
-          <option value="{{ product }}" {% if search_item == product.lower() %}selected{% endif %}>{{ product }}</option> <!-- Dynamically fill options with product list -->
+          <option value="{{ product }}" {% if search_item == product.lower() %}selected{% endif %}>{{ product }}</option>
         {% endfor %}
       </select>
-      <button type="submit">Search</button> <!-- Submit button for the form -->
-  </form>
+      <button type="submit">Search</button>
+    </form>
 
-  <!-- Display the search results in a table, shown only if an item is selected -->
-  {% if search_item %}
-  <h3>Most common order combinations for: {{ search_item }}</h3>
-  <table>
-      <thead>
+    {% if search_item %}
+      <!-- Display search results table if an item is selected -->
+      <h4>Results for: {{ search_item }}</h4>
+      <table>
+        <thead>
           <tr>
-              <th>Combination</th>
-              <th>Count</th>
-              <th>Percentage</th>
+            <th>Combination</th>
+            <th>Count</th>
+            <th>Percentage</th>
           </tr>
-      </thead>
-      <tbody>
+        </thead>
+        <tbody>
           {% for combo, count in search_top_combinations %}
           <tr>
-              <td>{{ combo }}</td> <!-- Combination name -->
-              <td>{{ count }}</td> <!-- Count of the combination -->
-              <td>{{ (count / total_combinations * 100)|round(2) }}%</td> <!-- Percentage calculation for the combination -->
+            <td>{{ combo }}</td>
+            <td>{{ count }}</td>
+            <td>{{ (count / total_combinations * 100)|round(2) }}%</td>
           </tr>
           {% endfor %}
-      </tbody>
-  </table>
+        </tbody>
+      </table>
+      <!-- Display total orders for the selected item -->
+      <p><strong>Total Orders including {{ search_item }}: {{ total_combinations }}</strong></p>
 
-  <!-- Display the total number of orders for the selected item -->
-  <p><strong>Total Orders including {{ search_item }}: {{ total_combinations }}</strong></p>
-
-  <!-- Heading for the polar area chart -->
-  <h3>Polar Area Chart for: {{ search_item }}</h3>
-
-  <!-- Canvas for rendering the polar area chart -->
-  <canvas id="polarChart" width="640" height="320"></canvas>
-  <script>
-    // Generate labels and data from the search results for the polar chart
-    const polarLabels = [
-      {% for combo, count in search_top_combinations %}
-        "{{ combo }}",
-      {% endfor %}
-    ];
-    const polarData = [
-      {% for combo, count in search_top_combinations %}
-        {{ count }},
-      {% endfor %}
-    ];
-
-    // Define colors for the segments in the polar area chart
-    const blueBackgroundColors = [
-      '#0d47a1', '#1565c0', '#1976d2', '#1e88e5', '#2196f3', '#42a5f5', '#64b5f6', '#90caf9', '#bbdefb', '#e3f2fd'
-    ];
-
-    // Slice the color array to match the number of data points
-    const datasetColors = blueBackgroundColors.slice(0, polarData.length);
-
-    // Plugin to make the r-scale visible always on the foreground of the polar chart
-    const foregroundScalePlugin = {
-      id: 'foregroundScalePlugin',
-      afterDatasetsDraw(chart, args, options) {
-        chart.scales.r.draw(); // Draw the scale at the front after rendering the datasets
-      }
-    };
-
-    // Initialize and render the polar area chart
-    const ctxPolar = document.getElementById('polarChart').getContext('2d');
-    new Chart(ctxPolar, {
-      type: 'polarArea', // Polar area chart type
-      data: {
-        labels: polarLabels, // Labels for each segment
-        datasets: [{
-          label: 'Counts',
-          data: polarData, // Data for the segments
-          backgroundColor: datasetColors, // Segment colors
-          borderColor: datasetColors, // Border colors for each segment
-          borderWidth: 1
-        }]
-      },
-      options: {
-        responsive: true, // Responsive chart resizing
-        scales: {
-          r: {
-            ticks: {
-              display: true, // Show ticks for the r-scale
-              color: 'black',
-              backdropColor: 'rgba(255, 255, 255, 0.8)',
-              padding: 5
-            },
-            grid: {
-              color: 'rgba(0, 0, 0, 0.2)' // Grid line color
-            },
-            title: {
-              display: true,
-              text: 'Count',
-              color: 'black' // Title for the r-scale
-            }
+      <!-- Polar Area Chart for the search results -->
+      <h4>Polar Area Chart for: {{ search_item }}</h4>
+      <canvas id="polarChart" width="640" height="320"></canvas>
+      <script>
+        // Generate labels and data for the polar chart from search results
+        const polarLabels = [
+          {% for combo, count in search_top_combinations %}
+            "{{ combo }}",
+          {% endfor %}
+        ];
+        const polarData = [
+          {% for combo, count in search_top_combinations %}
+            {{ count }},
+          {% endfor %}
+        ];
+        // Define 10 static blue colors (from very dark to light blue)
+        const blueBackgroundColors = [
+          '#0d47a1', '#1565c0', '#1976d2', '#1e88e5', '#2196f3',
+          '#42a5f5', '#64b5f6', '#90caf9', '#bbdefb', '#e3f2fd'
+        ];
+        // Use as many colors as there are data points
+        const datasetColors = blueBackgroundColors.slice(0, polarData.length);
+        // Plugin to redraw the radial scale on top
+        const foregroundScalePlugin = {
+          id: 'foregroundScalePlugin',
+          afterDatasetsDraw(chart, args, options) {
+            chart.scales.r.draw();
           }
-        }
-      },
-      plugins: [foregroundScalePlugin] // Add the foreground scale plugin
-    });
-  </script>
+        };
+        // Initialize the polar area chart
+        const ctxPolar = document.getElementById('polarChart').getContext('2d');
+        new Chart(ctxPolar, {
+          type: 'polarArea',
+          data: {
+            labels: polarLabels,
+            datasets: [{
+              label: 'Counts',
+              data: polarData,
+              backgroundColor: datasetColors,
+              borderColor: datasetColors,
+              borderWidth: 1
+            }]
+          },
+          options: {
+            responsive: true,
+            scales: {
+              r: {
+                ticks: {
+                  display: true,
+                  color: 'black',
+                  backdropColor: 'rgba(255, 255, 255, 0.8)',
+                  padding: 5
+                },
+                grid: { color: 'rgba(0, 0, 0, 0.2)' },
+                title: { display: true, text: 'Count', color: 'black' }
+              }
+            }
+          },
+          plugins: [foregroundScalePlugin]
+        });
+      </script>
+    {% endif %}
+  </div>
+
+  <!-- Section 3: Multi-Item Cart Recommendations -->
+<div class="section" id="section3">
+  <h3>Part 3: Multi-Item Cart Recommendations</h3>
+  <!-- Form with 9 separate dropdowns; Item 1 is required -->
+  <form action="{{ url_for('search_cart_combinations') }}" method="post">
+    <div>
+      <label for="item1">Item 1 (required):</label>
+      <select name="item1" id="item1" required>
+        <option value="" disabled selected>choose item</option>
+        {% for product in product_list %}
+          <option value="{{ product }}">{{ product }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label for="item2">Item 2:</label>
+      <select name="item2" id="item2">
+        <option value="" disabled selected>choose item</option>
+        {% for product in product_list %}
+          <option value="{{ product }}">{{ product }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label for="item3">Item 3:</label>
+      <select name="item3" id="item3">
+        <option value="" disabled selected>choose item</option>
+        {% for product in product_list %}
+          <option value="{{ product }}">{{ product }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label for="item4">Item 4:</label>
+      <select name="item4" id="item4">
+        <option value="" disabled selected>choose item</option>
+        {% for product in product_list %}
+          <option value="{{ product }}">{{ product }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label for="item5">Item 5:</label>
+      <select name="item5" id="item5">
+        <option value="" disabled selected>choose item</option>
+        {% for product in product_list %}
+          <option value="{{ product }}">{{ product }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label for="item6">Item 6:</label>
+      <select name="item6" id="item6">
+        <option value="" disabled selected>choose item</option>
+        {% for product in product_list %}
+          <option value="{{ product }}">{{ product }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label for="item7">Item 7:</label>
+      <select name="item7" id="item7">
+        <option value="" disabled selected>choose item</option>
+        {% for product in product_list %}
+          <option value="{{ product }}">{{ product }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label for="item8">Item 8:</label>
+      <select name="item8" id="item8">
+        <option value="" disabled selected>choose item</option>
+        {% for product in product_list %}
+          <option value="{{ product }}">{{ product }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label for="item9">Item 9:</label>
+      <select name="item9" id="item9">
+        <option value="" disabled selected>choose item</option>
+        {% for product in product_list %}
+          <option value="{{ product }}">{{ product }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <button type="submit">Search Cart Recommendations</button>
+  </form>
+
+  <!-- Display the selected cart if available -->
+  {% if cart_items %}
+    <h4>Selected Cart:</h4>
+    <p><strong>{{ cart_items }}</strong></p>
   {% endif %}
-</body>
-</html>
+
+  <!-- Display cart recommendations if available -->
+  {% if search_cart_recommendations %}
+      <h4>Additional items purchased by customers with this cart:</h4>
+      <table>
+          <thead>
+              <tr>
+                  <th>Item</th>
+                  <th>Count</th>
+                  <th>Percentage</th>
+              </tr>
+          </thead>
+          <tbody>
+              {% for item, count in search_cart_recommendations %}
+              <tr>
+                  <td>{{ item }}</td>
+                  <td>{{ count }}</td>
+                  <td>
+                    {% if cart_customers > 0 %}
+                      {{ (count / cart_customers * 100)|round(2) }}%
+                    {% else %}
+                      0%
+                    {% endif %}
+                  </td>
+              </tr>
+              {% endfor %}
+          </tbody>
+      </table>
+      <p><strong>Total customers with this cart: {{ cart_customers }}</strong></p>
+  {% endif %}
+</div>
